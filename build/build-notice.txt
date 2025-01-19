@@ -1,3 +1,0 @@
-These are the output files of the "Compilation" step.
-They are only updated on every push for site hosting reasons.
-Please see the src directory for usable files.
