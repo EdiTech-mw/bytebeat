@@ -61,7 +61,7 @@ export class UI {
 		this.mainElem = document.getElementById('content');
 	}
 	setCodeSize(value) {
-		this.controlCodeSize.textContent = formatBytes(new Blob([value]).size);
+		this.controlCodeSize.textContent = `${formatBytes(new Blob([value]).size, 1)} (${window.location.href.length}c)`;
 	}
 	setPlayButton(buttonElem, speed) {
 		const isFast = speed !== 1;
