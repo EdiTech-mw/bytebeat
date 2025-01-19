@@ -2,14 +2,14 @@
 
 :root {
 	--button-hover-color: #badbff;
-	--canvas-border: linear-gradient(#fda757, #fda757) 1;
-	--canvas-button: linear-gradient(to bottom, #67789d, #181f33);
+	--canvas-border: linear-gradient(#5dfd57, #42af3e) 1;
+	--canvas-button: linear-gradient(to bottom, #3c9b40, #183319);
 	--canvas-button-color: #c5c8c6;
-	--canvas-button-hover: linear-gradient(to bottom, #92aeec, #181f33) !important;
-	--code-author: #2b3d69;
-	--code-button: linear-gradient(to bottom, #424242, #171b22);
-	--code-button-border: #505760;
-	--code-button-hover: linear-gradient(to bottom, #3c508a, #1f2331);
+	--canvas-button-hover: linear-gradient(to bottom, #65c775, #18331d) !important;
+	--code-author: #2b6933;
+	--code-button: linear-gradient(to bottom, #171b22, #21bb2e);
+	--code-button-border: #bac2cc;
+	--code-button-hover: linear-gradient(to bottom, #35473d, #2edd3d);
 	--code-comment: #7d8799;
 	--code-definition: #b1b1ff;
 	--code-font: bold;
@@ -20,28 +20,51 @@
 	--code-punctuation: #c5c8c6;
 	--code-string: #a8ff60;
 	--code-string2: #56b6c2;
-	--code-tags: #5cac87;
+	--code-tags: #008040;
 	--code-variable: #c5c8c6;
-	--control-button: linear-gradient(to bottom, #959595, #242a37);
-	--control-button-active: linear-gradient(to bottom, #505f84, #1c1e26);
+	--control-button: linear-gradient(to bottom, #427745, #224725);
+	--control-button-active: linear-gradient(to bottom, #3c6341, #224725);
 	--control-button-border: #5c636c;
-	--control-button-hover: linear-gradient(to bottom, #738cc1, #28314a);
+	--control-button-hover: linear-gradient(to bottom, #528a5c, #224725);
 	--control-corners: 6px;
 	--control-size: 30px;
-	--control-text: linear-gradient(to top, #3a445e, #181c26);
+	--control-text: linear-gradient(to top, #3a5e3d, #224725);
 	--control-text-hover: linear-gradient(to top, #556897, #182033);
 	--control-volume: linear-gradient(to bottom, #aeaeae, #484c55);
 	--control-volume-hover: linear-gradient(to bottom, #90a7d7, #3f4c71);
 	--editor: #191c22;
 	--entry: #191c22;
-	--entry-border: linear-gradient(to right, #435a91, #16202b);
+	--entry-border: linear-gradient(to right, #439157, #16202b);
 	--focus: #614fdb;
 	--font-size: 10.5pt;
-	--library-header: linear-gradient(to bottom, #202c46, #0b0d17);
-	--library-header-hover: linear-gradient(to bottom, #32426c, #151b2b);
+	--library-header: linear-gradient(to bottom, #204620, #0b170c);
+	--library-header-hover: linear-gradient(to bottom, #326c35, #192b15);
 	--library-header-hover-color: #94c7ff;
 	--link: #89c2ff;
-	--link-hover: #ed88fb !important;
+	--link-hover: #3fe2e2 !important;
+}
+
+html[data-theme="Dollchan"] {
+	--canvas-border: linear-gradient(#fda757, #fda757) 1;
+	--canvas-button: linear-gradient(to bottom, #67789d, #181f33);
+	--canvas-button-hover: linear-gradient(to bottom, #92aeec, #181f33) !important;
+	--code-author: #2b3d69;
+	--code-button: linear-gradient(to bottom, #424242, #171b22);
+	--code-button-border: #505760;
+	--code-button-hover: linear-gradient(to bottom, #3c508a, #1f2331);
+	--code-tags: #5cac87;
+	--control-button: linear-gradient(to bottom, #959595, #242a37);
+	--control-button-active: linear-gradient(to bottom, #505f84, #1c1e26);
+	--control-button-border: #5c636c;
+	--control-button-hover: linear-gradient(to bottom, #738cc1, #28314a);
+	--control-text: linear-gradient(to top, #3a445e, #181c26);
+	--control-text-hover: linear-gradient(to top, #556897, #182033);
+	--control-volume: linear-gradient(to bottom, #aeaeae, #484c55);
+	--control-volume-hover: linear-gradient(to bottom, #90a7d7, #3f4c71);
+	--editor: #191c22;
+	--focus: #614fdb;
+	--library-header: linear-gradient(to bottom, #202c46, #0b0d17);
+	--library-header-hover: linear-gradient(to bottom, #32426c, #151b2b);
 }
 
 html[data-theme="Blue"] {
