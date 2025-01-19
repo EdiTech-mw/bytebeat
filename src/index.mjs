@@ -4,6 +4,7 @@ import { Scope } from './scope.mjs';
 import { UI } from './ui.mjs';
 import { getCodeFromUrl, getUrlFromCode } from './url.mjs';
 import { Actions } from './actions.mjs';
+import { splashes } from './splashes.mjs';
 
 const editor = new Editor();
 const library = new Library();
@@ -174,6 +175,7 @@ globalThis.bytebeat = new class {
 		ui.containerFixed.addEventListener('input', this);
 		ui.containerFixed.addEventListener('keydown', this);
 		ui.containerScroll.addEventListener('mouseover', this);
+		ui.splashElem.innerHTML = splashes[Math.random()*splashes.length|0];
 	}
 	async initAudio() {
 		this.audioCtx = new AudioContext({ latencyHint: 'balanced', sampleRate: 48000 });

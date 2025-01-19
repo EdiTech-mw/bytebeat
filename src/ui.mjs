@@ -31,6 +31,7 @@ export class UI {
 		this.okDialog = null;
 		this.okDialogText = null;
 		this.okDialogButton = null;
+		this.splashElem = null;
 		this.mainElem = null;
 	}
 	copyLink() {
@@ -74,6 +75,7 @@ export class UI {
 		this.yesNoDialogYesButton = document.getElementById('yesno-dialog-yes');
 		this.yesNoDialogNoButton = document.getElementById('yes-dialog-no');
 		this.downloader = document.getElementById('downloader');
+		this.splashElem = document.getElementById('splash');
 		this.mainElem = document.getElementById('content');
 	}
 	setCodeSize(value) {
