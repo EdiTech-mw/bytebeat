@@ -25,6 +25,12 @@ export class UI {
 		this.controlTime = null;
 		this.controlTimeUnits = null;
 		this.controlVolume = null;
+		this.actionAutoformat = null;
+		this.actionMinibake = null;
+		this.actionDeminibake = null;
+		this.okDialog = null;
+		this.okDialogText = null;
+		this.okDialogButton = null;
 		this.mainElem = null;
 	}
 	copyLink() {
@@ -57,11 +63,47 @@ export class UI {
 		this.controlTimeUnits = document.getElementById('control-counter-units');
 		this.controlThemeStyle = document.getElementById('control-theme-style');
 		this.controlVolume = document.getElementById('control-volume');
+		this.actionAutoformat = document.getElementById('actions-format');
+		this.actionMinibake = document.getElementById('actions-minibake');
+		this.actionDeminibake = document.getElementById('actions-deminibake');
+		this.okDialog = document.getElementById('ok-dialog');
+		this.okDialogText = document.getElementById('ok-dialog-text');
+		this.okDialogButton = document.getElementById('ok-dialog-ok');
+		this.yesNoDialog = document.getElementById('yesno-dialog');
+		this.yesNoDialogText = document.getElementById('yesno-dialog-text');
+		this.yesNoDialogYesButton = document.getElementById('yesno-dialog-yes');
+		this.yesNoDialogNoButton = document.getElementById('yes-dialog-no');
 		this.downloader = document.getElementById('downloader');
 		this.mainElem = document.getElementById('content');
 	}
 	setCodeSize(value) {
 		this.controlCodeSize.textContent = `${formatBytes(new Blob([value]).size, 1)} (${window.location.href.length}c)`;
+	}
+	okAlert(message, callback){
+		this.okDialogText.textContent = message;
+		this.okDialogButton.addEventListener('click',()=>{
+			this.okDialog.close();
+			if(callback) callback();
+		}, { once: true });
+		this.okDialog.showModal();
+	}
+	yesNoAlert(message, callbackYes, callbackNo) {
+		this.yesNoDialogText.textContent = message;
+	
+		const onYesClick = () => {
+			this.yesNoDialog.close();
+			callbackYes();
+			this.yesNoDialogNoButton.removeEventListener('click', onNoClick);
+		};
+	
+		const onNoClick = () => {
+			this.yesNoDialog.close();
+			callbackNo();
+			this.yesNoDialogYesButton.removeEventListener('click', onYesClick);
+		};
+	
+		this.yesNoDialogYesButton.addEventListener('click', onYesClick, { once: true });
+		this.yesNoDialogNoButton.addEventListener('click', onNoClick, { once: true });
 	}
 	setPlayButton(buttonElem, speed) {
 		const isFast = speed !== 1;

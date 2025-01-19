@@ -42,6 +42,7 @@
 	--library-header-hover-color: #94c7ff;
 	--link: #89c2ff;
 	--link-hover: #3fe2e2 !important;
+	--dialog-background: linear-gradient(to bottom,#000,#050);
 }
 
 html[data-theme="Dollchan"] {
@@ -65,6 +66,7 @@ html[data-theme="Dollchan"] {
 	--focus: #614fdb;
 	--library-header: linear-gradient(to bottom, #202c46, #0b0d17);
 	--library-header-hover: linear-gradient(to bottom, #32426c, #151b2b);
+	--dialog-background: linear-gradient(to bottom, #181f33, #67789d);
 }
 
 html[data-theme="Blue"] {
@@ -87,6 +89,7 @@ html[data-theme="Blue"] {
 	--focus: #9782ff;
 	--library-header: linear-gradient(to bottom, #2c3e6a, #101420);
 	--library-header-hover: linear-gradient(to bottom, #405588, #192035);
+	--dialog-background: linear-gradient(to bottom, #181f33, #4567b0);
 }
 
 html[data-theme="Cake"] {
@@ -115,6 +118,7 @@ html[data-theme="Cake"] {
 	--library-header: linear-gradient(to bottom, #c0359d, #00353a);
 	--library-header-hover: linear-gradient(to bottom, #ee58c9, #004950);
 	--library-header-hover-color: #94fbff;
+	--dialog-background: linear-gradient(to bottom, #b825a2, #259096);
 	--link: #88eafb;
 	--link-hover: #ff89ed !important;
 }
@@ -143,6 +147,7 @@ html[data-theme="Dusk"] {
 	--library-header: linear-gradient(to bottom, #202030, #404060);
 	--library-header-hover: linear-gradient(to bottom, #303048, #606096);
 	--library-header-hover-color: #d0d0f0;
+	--dialog-background: linear-gradient(to bottom, #202030, #606095);
 	--link: #8080c0;
 	--link-hover: #c0c0f0 !important;
 }
@@ -171,6 +176,7 @@ html[data-theme="Green"] {
 	--library-header: linear-gradient(to bottom, #20462c, #0b170d);
 	--library-header-hover: linear-gradient(to bottom, #326c42, #152b1b);
 	--library-header-hover-color: #94ffc7;
+	--dialog-background: linear-gradient(to bottom, #112211, #388036);
 	--link: #89ffac;
 }
 
@@ -196,6 +202,7 @@ html[data-theme="Orange"] {
 	--library-header: linear-gradient(to bottom, #c56600, #1d1206);
 	--library-header-hover: linear-gradient(to bottom, #f58004, #3b260d);
 	--library-header-hover-color: #ffffa5;
+	--dialog-background: linear-gradient(to bottom, #2b2016, #9c5416);
 	--link: #ff998e;
 }
 
@@ -220,6 +227,7 @@ html[data-theme="Purple"] {
 	--focus: #8289ff;
 	--library-header: linear-gradient(to bottom, #432046, #170b16);
 	--library-header-hover: linear-gradient(to bottom, #65326c, #2b152a);
+	--dialog-background: linear-gradient(to bottom, #2b152a, #65326c);
 	--link: #ca89ff;
 	--link-hover: #94c7ff !important;
 }
@@ -248,6 +256,7 @@ html[data-theme="Teal"] {
 	--library-header: linear-gradient(to bottom, #2b8082, #0e2828);
 	--library-header-hover: linear-gradient(to bottom, #3c9fa2, #214a4a);
 	--library-header-hover-color: #94fbff;
+	--dialog-background: linear-gradient(to bottom, #214a4a, #3c9fa2);
 	--link: #8efbff;
 }
 
@@ -332,6 +341,11 @@ option {
 .table-form th {
 	text-align: start;
 	background: #1f1e2b;
+}
+
+.alert-dialogs {
+	background-image: var(--dialog-background);
+	font: 24px monospace;
 }
 
 /* ==[ Containers ] ======================================================================================= */
@@ -780,6 +794,10 @@ button[name="close"] {
 .control-button[disabled] {
 	opacity: 0.5;
 	cursor: default;
+}
+
+.control-text-button {
+	padding: 0 10px 0 10px !important
 }
 
 .control-button:not([disabled]):hover, .control-select:hover {

@@ -12,10 +12,8 @@
 	<link rel="modulepreload" href="./build/audio-processor.mjs">
 	<script type="module" async src="./build/index.js"></script>
 </head>
-<body>
-	<!--p align="center" style="color: #FFFF00; font-size: 12px">This is not the dollChan player! That's <a href="https://dollchan.net/bytebeat/">this one.</a><br />Still, credit to SthephanShi for making the original site!</p>
-	<p id="splash" align="center" style="color: #00FFFF; font-size: 12px">MissingNo, but it's <i>true!</i></p-->
-		<div id="log"></div>
+<body>	
+<div id="log"></div>
 	<main id="content">
 		<section id="container-fixed">
 			<div id="editor-container">
@@ -24,16 +22,16 @@
 				</div>
 			</div>
 
-			<dialog id="code-is-already-minibaked">
-				<p>Code is already minibaked.</p>
-				<div style="display: flex; justify-content: center;"><button id="dialog-close">OK</button></div>
-			</dialog>
-			<dialog id="please-wait">
+			<dialog class="alert-dialogs" id="wait-dialog">
 				<p>Please wait...</p>
 			</dialog>
-			<dialog id="are-you-sure">
-				<p>Are you sure you want to remove this favorite?</p>
-				<div style="display: flex; justify-content: center;"><button id="dialog-yes">Yes</button><button id="dialog-no">No</button></div>
+			<dialog class="alert-dialogs" id="yesno-dialog">
+				<p id="yesno-dialog-text">Yes or no?</p>
+				<div style="display: flex; justify-content: center;"><button id="yesno-dialog-yes">Yes</button><button id="yesno-dialog-no">No</button></div>
+			</dialog>
+			<dialog class="alert-dialogs" id="ok-dialog">
+				<p id="ok-dialog-text">Alert!</p>
+				<div style="display: flex; justify-content: center;"><button id="ok-dialog-ok">OK</button></div>
 			</dialog>
 
 			<div class="controls" id="controls0">
@@ -152,6 +150,8 @@
 			</div>
 		</section>
 		<section id="container-scroll">
+			<p align="center" style="color: #ffe600; font-size: 12px"><b><i>This is not the Dollchan player!</i> That's <a href="https://dollchan.net/bytebeat/" target="_blank">this one.</b></a> Credits to SthephanShi for making the basis site!</p>
+			<p id="splash" align="center" style="color: #00aeff; font-size: 12px">MissingNo, but it's <i>true!</i></p>
 			<details class="library-content">
 				<summary class="library-header">
 					<h1>Info</h1> &ndash; about bytebeat
@@ -190,7 +190,7 @@
 					They are just a novelty, and use them at your own risk. I would remove them (and the exotic modes) if it weren't for compatibility.
 				</article>
 			</details>
-			<details class="library-content">
+			<!--details class="library-content">
 				<summary class="library-header" id="favorites-button">
 					<h1>Favorites &mdash; Codes you saved</h1>
 				</summary>
@@ -200,7 +200,7 @@
 					<div id="favorites-status"></div>
 					<ul id="favorites-contents"></ul>
 				</article>
-			</details>
+			</details-->
 			<details class="library-content">
 				<summary class="library-header">
 					<h1>Classic</h1> &ndash; C-compatible Bytebeat, one variable (t)
@@ -305,9 +305,22 @@
 						</select>
 						Colors for stereo channels&nbsp;
 					</label>
-					<label class="settings-block">
-						<a href="bytebeat.php?manage">Manage library</a>
-					</label>
+				</article>
+			</details>
+			<details class="library-content">
+				<summary class="library-header">
+					<h1>Song actions</h1>
+				</summary>
+				<article id="settings" class="library-container entry loaded">
+					<button id="actions-format" class="control-button control-text-button">
+						Autoformat
+					</button>
+					<button id="actions-minibake" class="control-button control-text-button">
+						Minibake
+					</button>
+					<button id="actions-deminibake" class="control-button control-text-button">
+						Deminibake
+					</button>
 				</article>
 			</details>
 			<!-- <details class="library-content">
@@ -337,8 +350,8 @@
 			</details> -->
 			<footer>
 				<a class="link" href="https://dollchan.net/btb/" title="Dollchan bytebeat discussion threads" target="_blank">Discussion board</a><br>
-				<a class="link" href="https://github.com/Chasyxx/EnBeat_NEW" title="Github repo" target="_blank">Source code</a>
-				<a class="link" href="https://github.com/SthephanShinkufag/bytebeat-composer" title="Dollchan Github repo" target="_blank">Source code</a>
+				<a class="link" href="https://github.com/Chasyxx/EnBeat_NEW" title="This site's Github repo" target="_blank">This site's source code</a><br>
+				<a class="link" href="https://github.com/SthephanShinkufag/bytebeat-composer" title="Dollchan's Github repo" target="_blank">Dollchan's source code</a>
 			</footer>
 		</section>
 	</main>

@@ -3,11 +3,13 @@ import { Library } from './library.mjs';
 import { Scope } from './scope.mjs';
 import { UI } from './ui.mjs';
 import { getCodeFromUrl, getUrlFromCode } from './url.mjs';
+import { Actions } from './actions.mjs';
 
 const editor = new Editor();
 const library = new Library();
 const scope = new Scope();
 const ui = new UI();
+const actions = new Actions();
 
 globalThis.bytebeat = new class {
 	constructor() {
@@ -92,6 +94,9 @@ globalThis.bytebeat = new class {
 			case 'control-scaleup': this.setScale(1); break;
 			case 'control-stop': this.playbackStop(); break;
 			case 'control-counter-units': this.toggleCounterUnits(); break;
+			case 'actions-format': this.formatCode(); break;
+			case 'actions-minibake': this.bake(); break;
+			case 'actions-deminibake': this.debake(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -496,10 +501,6 @@ globalThis.bytebeat = new class {
 			colorDiagram = '#ff00ff';
 			colorStereo = 0;
 			break;
-		case 'Green':
-			colorCursor = '#ff0000';
-			colorDiagram = '#00c080';
-			break;
 		case 'Orange':
 			colorCursor = '#ffff80';
 			colorDiagram = '#8000ff';
@@ -515,8 +516,8 @@ globalThis.bytebeat = new class {
 			colorDiagram = '#00ffff';
 			break;
 		default:
-			colorCursor = '#80c0ff';
-			colorDiagram = '#0080ff';
+			colorCursor = '#00ff00';
+			colorDiagram = '#00c080';
 		}
 		this.setColorTimeCursor(colorCursor);
 		this.setColorStereo(colorStereo);
@@ -555,6 +556,34 @@ globalThis.bytebeat = new class {
 		this.audioRecorder.start();
 		this.audioRecordChunks = [];
 		this.playbackToggle(true);
+	}
+	formatCode() {
+		const code1 = editor.value;
+		const data = actions.commaFormat(code1);
+		if(data.error) {
+			ui.okAlert(`Format failed: ${data.error}!`);
+			return;
+		}
+		editor.setValue(data.code)
+	}
+	bake() {
+		let toEncode = editor.value;
+
+		if (actions.unminibakeCode(toEncode)!==toEncode) {
+			ui.okAlert("Code is already minibaked.");
+			return;
+		}
+
+		const l = actions.minibakeCode(toEncode)
+		if (actions.unminibakeCode(l) !== l) {
+			editor.setValue(l);
+		} else {
+			ui.okAlert("Minibaking reverted: the player will lag!");
+		}
+		return;
+	}
+	debake() {	
+		editor.setValue(actions.unminibakeCode(editor.value))
 	}
 	updateUrl() {
 		const code = editor.value;
