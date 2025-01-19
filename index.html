@@ -8,10 +8,9 @@
 	<title id="TAB-NAME">CHASYXX Bytebeat Player</title>
 	<link rel="canonical" href="https://chasyxx.github.io/EnBeat_NEW"/>
 	<link rel="shortcut icon" href="./favicon.png">
-	<link rel="stylesheet" type="text/css" href="bytebeat.css?version=2023022000">
-	<link rel="modulepreload" href="./scripts/audioProcessor.mjs?version=2023022000">
-	<script type="module" async src="./scripts/bytebeat.mjs?version=2023022000"></script>
-	<script type="module" async src="menus.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css?version=2024122300">
+	<link rel="modulepreload" href="./build/audio-processor.mjs?version=2024122300">
+	<script type="module" async src="./build/index.js?version=2024122300"></script>
 </head>
 <body>
 	<!--p align="center" style="color: #FFFF00; font-size: 12px">This is not the dollChan player! That's <a href="https://dollchan.net/bytebeat/">this one.</a><br />Still, credit to SthephanShi for making the original site!</p>
@@ -20,10 +19,9 @@
 	<main id="content">
 		<section id="container-fixed">
 			<div id="editor-container">
-				<textarea  id="editor-default" spellcheck="false">a=&quot;CHASYXX Bytebeat composer&quot;,aa=a.charCodeAt((((t&amp;t&gt;&gt;14)&amp;7)+t*(t&gt;&gt;11&amp;7^t&gt;&gt;10&amp;3))%(a.length)),
-b=&quot;by Chase T&quot;,bb=b.charCodeAt((((t&amp;t&gt;&gt;17)&amp;7)+t*(t&gt;&gt;12&amp;7^t&gt;&gt;10&amp;7))%(b.length)),
-c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt;20)+((t*1.07)&gt;&gt;2)*(t&gt;&gt;13&amp;7^t&gt;&gt;10&amp;15))%(c.length)),
-((aa+bb+cc)/2)|t&gt;&gt;4</textarea>
+				<div id="editor-default">
+					<svg><use xlink:href="#symbol-wait"></svg>
+				</div>
 			</div>
 
 			<dialog id="code-is-already-minibaked">
@@ -41,7 +39,7 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 			<div class="controls" id="controls0">
 				<div class="controls-group controls-grow">
 					<button id="control-counter-units" class="control-button" title="Time units">t</button>
-					<input type="text" id="control-counter" value="0" title="Set time to jump along the timeline then press Enter">
+					<input type="text" id="control-counter" class="control-text" value="0" title="Set time to jump along the timeline then press Enter">
 				</div>
 				<div class="controls-group">
 					<button id="control-stop" class="control-button" title="Stop and reset">
@@ -70,16 +68,35 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 					<button id="control-scaledown" class="control-button" title="Zoom in the scope">
 						<svg><use xlink:href="#symbol-scaledown"></use></svg>
 					</button>
-					<div id ="scale-indicator" class="control-indicator tube text-padding">N/A</div>
+					<div id="control-scale" class="control-button" title="Scope zoom factor. Click to reset."></div>
 					<button id="control-scaleup" class="control-button" title="Zoom out the scope">
 						<svg><use xlink:href="#symbol-scaleup"></use></svg>
 					</button>
 				</div>
 				<select id="control-drawmode" class="control-select controls-grow" title="Drawing mode">
-					<option class="song-options" value="Points" selected>Points</option>
-					<option class="song-options" value="Waveform"		>Waveform</option>
-					<option class="song-options" value="Diagram" 		>Diagram</option>
+					<option value="Points" selected>Points</option>
+					<option value="Waveform">Waveform</option>
+					<option value="Diagram">Diagram</option>
+					<option value="Combined">Combined</option>
 				</select>
+				<select id="control-mode" class="control-select controls-grow" title="Sound mode">
+					<option value="Bytebeat" selected>Bytebeat</option>
+					<option value="Signed Bytebeat">Signed Bytebeat</option>
+					<option value="Floatbeat">Floatbeat</option>
+					<option value="Funcbeat">Funcbeat</option>
+				</select>
+				<div class="controls-group controls-grow">
+					<input type="text" id="control-samplerate" class="control-text" title="Set sample rate (in Hz) then press Enter">
+					<select id="control-samplerate-select" class="control-select" title="Sample rate">
+						<option value="8000">8000Hz</option>
+						<option value="11025">11025Hz</option>
+						<option value="16000">16000Hz</option>
+						<option value="22050">22050Hz</option>
+						<option value="32000">32000Hz</option>
+						<option value="44100">44100Hz</option>
+						<option value="48000">48000Hz</option>
+					</select>
+				</div>
 				<div class="controls-group">
 					<button id="control-rec" class="control-button" title="Record to the file">
 						<svg><use xlink:href="#symbol-rec"></use></svg>
@@ -90,7 +107,7 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 					<button id="control-expand" class="control-button" title="Expand the code editor">
 						<svg><use xlink:href="#symbol-expand"></use></svg>
 					</button>
-					<span id="control-codesize" title="Code size (Link size) in characters"></span>
+					<span id="control-codesize" class="control-text" title="Code size in bytes (link size in characters)"></span>
 				</div>
 				<div class="controls-group controls-grow">
 					<input id="control-volume" type="range" min="0" max="1" value=".5" step="any" title="Volume">
@@ -162,9 +179,9 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 		<section id="container-scroll">
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>Info &mdash; about bytebeat</h1>
+					<h1>Info</h1> &ndash; about bytebeat
 				</summary>
-				<article id="info" class="library-container entry-top">
+				<article id="info" class="library-container entry loaded">
 					Bytebeat music (or one-liner music) was invented in September 2011.
 					They're generally a piece of rhythmic and somewhat melodic music with no score, no instruments, and no real oscillators.
 					It's simply a single-line formula that defines a waveform as a function of time, processed (usually) 8000 times per second, resulting in an audible waveform with a 256-step resolution from silence (0) to full amplitude (256).
@@ -211,38 +228,112 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 			</details>
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>Classic &mdash; C compatible code with one variable (t)</h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
+					<h1>Classic</h1> &ndash; C-compatible Bytebeat, one variable (t)
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
 				</summary>
 				<div id="library-classic" class="library-container"></div>
 			</details>
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>Compact JS &mdash; compact JavaScript code</h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
+					<h1>JS-256</h1> &ndash; JS Bytebeat code under 256 bytes
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
 				</summary>
-				<div id="library-compact-js" class="library-container"></div>
+				<div id="library-js-256" class="library-container"></div>
 			</details>
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>Big JS &mdash; big JavaScript code</h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
+					<h1>JS-1k</h1> &ndash; JS Bytebeat code under 1 KB
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
 				</summary>
-				<div id="library-big-js" class="library-container"></div>
+				<div id="library-js-1k" class="library-container"></div>
 			</details>
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>Floatbeat &mdash; assumes output is -1.0 to 1.0<h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
+					<h1>JS-big</h1> &ndash; JS Bytebeat code larger than 1 KB
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
+				</summary>
+				<div id="library-js-big" class="library-container"></div>
+			</details>
+			<details class="library-content">
+				<summary class="library-header">
+					<h1>Floatbeat</h1> &ndash; assumes output is -1 to 1
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
 				</summary>
 				<div id="library-floatbeat" class="library-container"></div>
 			</details>
 			<details class="library-content">
 				<summary class="library-header">
-					<h1>SthephanShi &mdash; code SthephanShi created</h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
+					<h1>Floatbeat-big</h1> &ndash; Floatbeat code larger than 1 KB
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
 				</summary>
-				<div id="sthephanshi" class="library-container"></div>
+				<div id="library-floatbeat-big" class="library-container"></div>
+			</details>
+			<details class="library-content">
+				<summary class="library-header">
+					<h1>Funcbeat</h1> &ndash; statement based mode
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></svg>
+				</summary>
+				<div id="library-funcbeat" class="library-container"></div>
+			</details>
+			<details class="library-content">
+				<summary class="library-header">
+					<h1>All</h1> &ndash; all songs sorted by authors
+					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"></use></svg>
+				</summary>
+				<div id="library-all" class="library-container"></div>
+			</details>
+			<details class="library-content">
+				<summary class="library-header">
+					<h1>Settings</h1>
+				</summary>
+				<article id="settings" class="library-container entry loaded">
+					<label class="settings-block">
+						<select id="control-theme-style" class="control-select" title="Player theme style">
+							<option value="Default" selected>Default</option>
+							<option value="Blue">Blue</option>
+							<option value="Cake">Cake</option>
+							<option value="Dusk">Dusk</option>
+							<option value="Green">Green</option>
+							<option value="Orange">Orange</option>
+							<option value="Purple">Purple</option>
+							<option value="Teal">Teal</option>
+						</select>
+						Theme style
+					</label>
+					<label class="settings-block">
+						<select id="control-code-style" class="control-select" title="Code highlight style">
+							<option value="Atom Dark" selected>Atom Dark</option>
+							<option value="One Dark">One Dark</option>
+							<option value="SArpnt">SArpnt</option>
+						</select>
+						Code style
+					</label>
+					<label class="settings-block">
+						<input type="color" id="control-color-timecursor" class="control-color" title="Click to pick the time cursor color">
+						Time cursor color in the scope
+					</label>
+					<label class="settings-block">
+						<input type="color" id="control-color-waveform" class="control-color" title="Click to pick the Waveform color">
+						Waveform color in the scope.&nbsp;
+						<span id="control-color-waveform-info"></span>
+					</label>
+					<label class="settings-block">
+						<input type="color" id="control-color-diagram" class="control-color" title="Click to pick the Diagram color">
+						Diagram color in the scope.&nbsp;
+						<span id="control-color-diagram-info"></span>
+					</label>
+					<label class="settings-block">
+						<select id="control-color-stereo" class="control-select" title="Color channels for waveform and diagram">
+							<option value="0">Left=R, Right=G+B</option>
+							<option value="1" selected>Left=G, Right=R+B</option>
+							<option value="2">Left=B, Right=R+G</option>
+						</select>
+						Colors for stereo channels&nbsp;
+					</label>
+					<label class="settings-block">
+						<a href="bytebeat.php?manage">Manage library</a>
+					</label>
+				</article>
 			</details>
 			<!-- <details class="library-content">
 				<summary class="library-header">
@@ -270,8 +361,9 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 				</article>
 			</details> -->
 			<footer>
-				<a class="link" href="https://dollchan.net/btb" title="Dollchan discussion threads" target="_blank">&gt;&gt; Dollchan Discussion threads</a><br />
-				<a class="link" href="https://github.com/Chasyxx/EnBeat_NEW" title="Github repository" target="_blank">&gt;&gt; Github</a>
+				<a class="link" href="https://dollchan.net/btb/" title="Dollchan bytebeat discussion threads" target="_blank">Discussion board</a><br>
+				<a class="link" href="https://github.com/Chasyxx/EnBeat_NEW" title="Github repo" target="_blank">Source code</a>
+				<a class="link" href="https://github.com/SthephanShinkufag/bytebeat-composer" title="Dollchan Github repo" target="_blank">Source code</a>
 			</footer>
 		</section>
 	</main>
@@ -280,46 +372,47 @@ c=&quot;Fork of StephanShi&apos;s player&quot;	,cc=c.charCodeAt(((t&amp;t&gt;&gt
 	<div id="svg-icons" style="height: 0; width: 0; overflow: hidden;">
 		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 			<symbol viewBox="0 0 32 32" id="symbol-play">
-				<path d="m23 14.3-9-5.2c-1.3-.8-3 .2-3 1.7v10.4c0 1.5 1.7 2.5 3 1.7l9-5.2c1.3-.7 1.3-2.7 0-3.4z"/>
+				<path d="m23 14.3-9-5.2c-1.3-.8-3 .2-3 1.7v10.4c0 1.5 1.7 2.5 3 1.7l9-5.2c1.3-.7 1.3-2.7 0-3.4z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-fast">
-				<path d="M17.3 11.7v8.6c0 1.7 2 2.6 3.3 1.5l5.3-4.3c1-.8 1-2.3 0-3.1l-5.3-4.3c-1.3-1-3.3-.1-3.3 1.6"/>
+				<path d="M17.3 11.7v8.6c0 1.7 2 2.6 3.3 1.5l5.3-4.3c1-.8 1-2.3 0-3.1l-5.3-4.3c-1.3-1-3.3-.1-3.3 1.6" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-pause">
-				<path d="M12.5 23c-1.1 0-2-.9-2-2V11c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2zm7 0c-1.1 0-2-.9-2-2V11c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2z"/>
+				<path d="M12.5 23c-1.1 0-2-.9-2-2V11c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2zm7 0c-1.1 0-2-.9-2-2V11c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-stop">
-				<path d="M20.3 22.3h-8.5c-1.1 0-2-.9-2-2v-8.5c0-1.1.9-2 2-2h8.5c1.1 0 2 .9 2 2v8.5c0 1.1-.9 2-2 2z"/>
+				<path d="M20.3 22.3h-8.5c-1.1 0-2-.9-2-2v-8.5c0-1.1.9-2 2-2h8.5c1.1 0 2 .9 2 2v8.5c0 1.1-.9 2-2 2z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-reset">
-				<path d="M11.8 22.3c-1.1 0-2-.9-2-2v-8.5c0-1.1.9-2 2-2s2 .9 2 2v8.5c0 1.1-.9 2-2 2zm10.5-10.6v8.6c0 1.7-2 2.6-3.3 1.6l-5.3-4.3c-1-.8-1-2.3 0-3.1l5.3-4.3c1.3-1.1 3.3-.2 3.3 1.5z"/>
+				<path d="M11.8 22.3c-1.1 0-2-.9-2-2v-8.5c0-1.1.9-2 2-2s2 .9 2 2v8.5c0 1.1-.9 2-2 2zm10.5-10.6v8.6c0 1.7-2 2.6-3.3 1.6l-5.3-4.3c-1-.8-1-2.3 0-3.1l5.3-4.3c1.3-1.1 3.3-.2 3.3 1.5z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-rec">
-				<circle cx="16" cy="16" r="6.3"/>
+				<circle cx="16" cy="16" r="6.3" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-scaledown">
-				<path d="M16.5 24h-1c-1.1 0-2-.9-2-2V10c0-1.1.9-2 2-2h1c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2zM8 16.5v-1c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2H10c-1.1 0-2-.9-2-2z"/>
+				<path d="M16.5 24h-1c-1.1 0-2-.9-2-2V10c0-1.1.9-2 2-2h1c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2zM8 16.5v-1c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2H10c-1.1 0-2-.9-2-2z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-scaleup">
-				<path d="M8 16.5v-1c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2H10c-1.1 0-2-.9-2-2z"/>
+				<path d="M8 16.5v-1c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2H10c-1.1 0-2-.9-2-2z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-link">
-				<path d="M17 22.5H8c-1.7 0-3-1.3-3-3v-4c0-1.7 1.3-3 3-3h2v3H9c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V15h3v4.5c0 1.7-1.3 3-3 3zm7-3h-2v-3h1c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-7c-.6 0-1 .4-1 1V17h-3v-4.5c0-1.7 1.3-3 3-3h9c1.7 0 3 1.3 3 3v4c0 1.7-1.3 3-3 3z"/>
+				<path d="M17 22.5H8c-1.7 0-3-1.3-3-3v-4c0-1.7 1.3-3 3-3h2v3H9c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h7c.6 0 1-.4 1-1V15h3v4.5c0 1.7-1.3 3-3 3zm7-3h-2v-3h1c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-7c-.6 0-1 .4-1 1V17h-3v-4.5c0-1.7 1.3-3 3-3h9c1.7 0 3 1.3 3 3v4c0 1.7-1.3 3-3 3z" />
 			</symbol>
 			<symbol viewBox="0 0 32 32" id="symbol-expand">
-				<path d="M10.5 7.5H13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5h-2.5V13c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5v-2.5c0-1.7 1.3-3 3-3zm11 17H19c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5h2.5V19c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v2.5c0 1.7-1.3 3-3 3zm3-14V13c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5v-2.5H19c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5h2.5c1.7 0 3 1.3 3 3zm-17 11V19c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v2.5H13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5h-2.5c-1.7 0-3-1.3-3-3z"/>
+				<path d="M10.5 7.5H13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5h-2.5V13c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5v-2.5c0-1.7 1.3-3 3-3zm11 17H19c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5h2.5V19c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v2.5c0 1.7-1.3 3-3 3zm3-14V13c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5v-2.5H19c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5h2.5c1.7 0 3 1.3 3 3zm-17 11V19c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v2.5H13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5h-2.5c-1.7 0-3-1.3-3-3z" />
 			</symbol>
 			<symbol viewBox="0 0 16 16" id="symbol-wait">
-				<circle fill="#929087" cx="8" cy="2" r="2"/>
-				<circle fill="#C5C2BA" cx="8" cy="14" r="2"/>
-				<circle fill="#ACAAA0" cx="2" cy="8" r="2"/>
-				<circle fill="#79766C" cx="14" cy="8" r="2"/>
-				<circle fill="#D2CFC6" cx="12.25" cy="12.25" r="2"/>
-				<circle fill="#9F9C93" cx="3.75" cy="3.75" r="2"/>
-				<circle fill="#B9B6AE" cx="3.75" cy="12.25" r="2"/>
-				<circle fill="#868379" cx="12.25" cy="3.75" r="2"/>
+				<circle fill="#929087" cx="8" cy="2" r="2" />
+				<circle fill="#C5C2BA" cx="8" cy="14" r="2" />
+				<circle fill="#ACAAA0" cx="2" cy="8" r="2" />
+				<circle fill="#79766C" cx="14" cy="8" r="2" />
+				<circle fill="#D2CFC6" cx="12.25" cy="12.25" r="2" />
+				<circle fill="#9F9C93" cx="3.75" cy="3.75" r="2" />
+				<circle fill="#B9B6AE" cx="3.75" cy="12.25" r="2" />
+				<circle fill="#868379" cx="12.25" cy="3.75" r="2" />
 			</symbol>
 		</svg>
 	</div>
+	<a id="downloader" class="hidden"></a>
 </body>
 </html>
