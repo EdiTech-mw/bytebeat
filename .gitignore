@@ -1,4 +1,5 @@
 .htaccess
-build
+/build
+/artifactRoot
 node_modules
 settings.php
