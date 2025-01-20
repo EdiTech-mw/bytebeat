@@ -31,7 +31,8 @@ globalThis.bytebeat = new class {
 			isSeconds: false,
 			showAllSongs: library.showAllSongs,
 			themeStyle: 'Default',
-			volume: .5
+			volume: .5,
+			audioSampleRate: 48000
 		};
 		this.isCompilationError = false;
 		this.isNeedClear = false;
@@ -101,6 +102,7 @@ globalThis.bytebeat = new class {
 			case 'actions-deminibake': this.debake(); break;
 			case 'favorites-savefavorite': this.saveFavorite(); break;
 			case 'favorites-reload': this.loadFavoriteList(); break;
+			case 'settings-audiorate-apply': this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -150,6 +152,7 @@ globalThis.bytebeat = new class {
 			this.saveSettings();
 		}
 		this.setThemeStyle();
+		this.setAudioSampleRate();
 		await this.initAudio();
 		if(document.readyState === 'loading') {
 			document.addEventListener('DOMContentLoaded', () => this.initAfterDom());
@@ -176,6 +179,7 @@ globalThis.bytebeat = new class {
 		this.setColorWaveform();
 		this.setColorTimeCursor();
 		this.setScale(0);
+		ui.settingsAudioRate.value = this.settings.audioSampleRate;
 		this.parseUrl();
 		this.sendData({ drawMode: scope.drawMode });
 		ui.controlDrawMode.value = scope.drawMode;
@@ -188,7 +192,7 @@ globalThis.bytebeat = new class {
 		ui.containerScroll.addEventListener('mouseover', this);
 	}
 	async initAudio() {
-		this.audioCtx = new AudioContext({ latencyHint: 'balanced', sampleRate: 48000 });
+		this.audioCtx = new AudioContext({ latencyHint: 'balanced', sampleRate: this.settings.audioSampleRate });
 		this.audioGain = new GainNode(this.audioCtx);
 		this.audioGain.connect(this.audioCtx.destination);
 		await this.audioCtx.audioWorklet.addModule('./build/audio-processor.mjs');
@@ -436,6 +440,19 @@ globalThis.bytebeat = new class {
 		ui.controlColorWaveform.value = value;
 		ui.controlColorWaveformInfo.innerHTML = scope.getColorTest('colorWaveform', value);
 	}
+	setAudioSampleRate(value) {
+		if(value !== undefined) {
+			if(value < 8000 || value > 192000) {
+				value = 48000;
+			}
+			this.settings.audioSampleRate = value;
+			this.saveSettings();
+			window.location.reload();
+		} else if((value = this.settings.audioSampleRate) === undefined) {
+			value = this.settings.audioSampleRate = this.defaultSettings.audioSampleRate;
+			this.saveSettings();
+		}
+	}
 	setCounterUnits() {
 		ui.controlTimeUnits.textContent = this.settings.isSeconds ? 'sec' : 't';
 		this.setCounterValue(this.byteSample);
@@ -456,7 +473,7 @@ globalThis.bytebeat = new class {
 	setSampleRate(sampleRate, isSendData = true) {
 		if(!sampleRate || !isFinite(sampleRate) ||
 			// Float32 limit
-			(sampleRate = Number(parseFloat(Math.abs(sampleRate)).toFixed(3))) > 3.4028234663852886E+38
+			(sampleRate = Number(parseFloat(Math.abs(sampleRate)).toFixed(4))) > 3.4028234663852886E+38
 		) {
 			sampleRate = 8000;
 		}

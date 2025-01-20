@@ -309,6 +309,16 @@
 						</select>
 						Colors for stereo channels&nbsp;
 					</label>
+					<label class="settings-block">
+						Audio sample rate:&nbsp;&nbsp;
+						<div class="controls-group controls-grow" width="128">
+							<input value="48000" type="number" id="settings-audiorate" class="control-text" title="Set audio sample rate and click &quot;Apply&quot;">
+							<button id="settings-audiorate-apply" class="control-button control-text-button">Apply</button>
+						</div>
+					</label>
+					<p>The song's samplerate is upscaled/downscaled (block resampling!) to this samplerate. 48000 or above is recommended, likely some multiple of 48000.<br>
+					Be warned: The higher you put this, the more powerful your computer is expected to be!<br>
+				    You need to stay in the range [8000, 192000]. <b>Keep in mind that 48000 covers all frequencies you will be able to hear,</b> you only need to turn it up if you want to go ultrasonic.</p>
 				</article>
 			</details>
 			<details class="library-content">

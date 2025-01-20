@@ -35,6 +35,8 @@ export class UI {
 		this.favoritesSaveButton = null;
 		this.favoritesReloadButton = null;
 		this.favoritesList = null;
+		this.settingsAudioRate = null;
+		this.settingsAudioRateApplyButton = null;
 		this.downloader = null;
 		this.splashElem = null;
 		this.mainElem = null;
@@ -83,6 +85,8 @@ export class UI {
 		this.favoritesSaveButton = document.getElementById('favorites-savefavorite');
 		this.favoritesReloadButton = document.getElementById('favorites-reload');
 		this.favoritesList = document.getElementById('favorites-content');
+		this.settingsAudioRate = document.getElementById('settings-audiorate');
+		this.settingsAudioRateApplyButton = document.getElementById('settings-audiorate-apply');
 		this.downloader = document.getElementById('downloader');
 		this.splashElem = document.getElementById('splash');
 		this.mainElem = document.getElementById('content');
