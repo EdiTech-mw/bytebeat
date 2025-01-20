@@ -41,6 +41,7 @@ globalThis.bytebeat = new class {
 		this.playbackSpeed = 1;
 		this.sampleRate = 8000;
 		this.settings = this.defaultSettings;
+		this.expectedDomain = 'chasyxx';
 		this.init();
 	}
 	handleEvent(e) {
@@ -98,12 +99,15 @@ globalThis.bytebeat = new class {
 			case 'actions-format': this.formatCode(); break;
 			case 'actions-minibake': this.bake(); break;
 			case 'actions-deminibake': this.debake(); break;
+			case 'favorites-savefavorite': this.saveFavorite(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
 						elem.hasAttribute('data-songdata') ? JSON.parse(elem.dataset.songdata) : {}));
+					this.setSplashtext();
 				} else if(elem.classList.contains('code-load')) {
 					library.onclickCodeLoadButton(elem);
+					this.setSplashtext();
 				} else if(elem.classList.contains('code-remix-load')) {
 					library.onclickRemixLoadButton(elem);
 				} else if(elem.classList.contains('library-header')) {
@@ -151,6 +155,12 @@ globalThis.bytebeat = new class {
 			return;
 		}
 		this.initAfterDom();
+		this.loadFavoriteList();
+		this.setSplashtext();
+		if(!window.location.hostname.includes(this.expectedDomain) && !window.location.hostname.startsWith("127.") && !window.location.hostname.includes("local")) {
+			ui.okAlert(
+				`[ALERT]\n\nThe expected domain '${this.expectedDomain}' was not found.\nWhile this site might just be a skid of '${this.expectedDomain}' (try looking up '${this.expectedDomain} bytebeat player'),\nthis site has softened up from before and will still let you use it.\nHopefully you find the original. Hope for the best.\n\n - Creator of ${this.expectedDomain} bytebeat player`)
+		}
 	}
 	initAfterDom() {
 		editor.init();
@@ -175,7 +185,6 @@ globalThis.bytebeat = new class {
 		ui.containerFixed.addEventListener('input', this);
 		ui.containerFixed.addEventListener('keydown', this);
 		ui.containerScroll.addEventListener('mouseover', this);
-		ui.splashElem.innerHTML = splashes[Math.random()*splashes.length|0];
 	}
 	async initAudio() {
 		this.audioCtx = new AudioContext({ latencyHint: 'balanced', sampleRate: 48000 });
@@ -207,6 +216,11 @@ globalThis.bytebeat = new class {
 			setTimeout(() => window.URL.revokeObjectURL(url));
 		});
 		this.audioGain.connect(mediaDest);
+	}
+	setSplashtext() {
+		if(!window.location.hostname.includes(this.expectedDomain) && !window.location.hostname.startsWith("127.") && !window.location.hostname.includes("local")) 
+			ui.splashElem.innerHTML = "Featuring the Disturbance in the Force!";
+		else ui.splashElem.innerHTML = splashes[Math.random()*splashes.length|0];
 	}
 	loadCode({ code, sampleRate, mode, drawMode, scale }, isPlay = true) {
 		this.mode = ui.controlPlaybackMode.value = mode = mode || 'Bytebeat';
@@ -591,5 +605,65 @@ globalThis.bytebeat = new class {
 		const code = editor.value;
 		ui.setCodeSize(code);
 		getUrlFromCode(code, this.mode, this.sampleRate);
+	}
+	saveFavorite() {
+		this.updateUrl();
+		try {
+			const favorites = JSON.parse(localStorage.favorites??"{}");
+			favorites[encodeURIComponent(`${this.sampleRate} ${this.mode}: ${ui.favoritesNameInput.value}`)] = encodeURIComponent(window.location.hash);
+			localStorage.favorites = JSON.stringify(favorites);
+		} catch(e) {
+			ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
+				localStorage.favorites="{}";
+			},()=>{})
+		} finally {
+			this.loadFavoriteList();
+		}
+	}
+	loadFavoriteList() {
+		try {
+			const favorites = JSON.parse(localStorage.favorites??"{}");
+			while(ui.favoritesList.children.length > 0) ui.favoritesList.removeChild(ui.favoritesList.children[0]); // sacrifice to Armok
+			for(let i in favorites) {
+				const decodedName = decodeURIComponent(i);
+				const url = decodeURIComponent(favorites[i]);
+				const li = document.createElement('li');
+				const li_nameButton = document.createElement('button');
+				li_nameButton.textContent = `${decodedName}`;
+				li_nameButton.classList.add("favorites-delete");
+				li_nameButton.addEventListener('click',()=>{
+					ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
+						try {
+							const favorites = JSON.parse(localStorage.favorites??"{}");
+							delete favorites[encodeURIComponent(decodedName)];
+							localStorage.favorites = JSON.stringify(favorites);
+						} catch(e) {
+							ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
+								localStorage.favorites="{}";
+							},()=>{})
+						} finally {
+							this.loadFavoriteList();
+						}
+					},()=>{})
+				})
+				const li_codeSpan = document.createElement('span');
+				li_codeSpan.classList.add('favorite-text');
+				li_codeSpan.addEventListener('click',()=>{
+					window.location.hash = url;
+					this.parseUrl();
+					this.resetTime();
+					this.updateUrl();
+					this.setSplashtext();
+				})
+				li_codeSpan.innerText = url;
+				li.appendChild(li_nameButton);
+				li.appendChild(li_codeSpan);
+				ui.favoritesList.appendChild(li);
+			}
+		} catch(e) {
+			ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
+				localStorage.favorites="{}";
+			},()=>{})
+		}
 	}
 }();

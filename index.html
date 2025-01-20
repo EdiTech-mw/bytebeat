@@ -27,11 +27,11 @@
 			</dialog>
 			<dialog class="alert-dialogs" id="yesno-dialog">
 				<p id="yesno-dialog-text">Yes or no?</p>
-				<div style="display: flex; justify-content: center;"><button id="yesno-dialog-yes">Yes</button><button id="yesno-dialog-no">No</button></div>
+				<div><button id="yesno-dialog-yes">Yes</button><button id="yesno-dialog-no">No</button></div>
 			</dialog>
 			<dialog class="alert-dialogs" id="ok-dialog">
 				<p id="ok-dialog-text">Alert!</p>
-				<div style="display: flex; justify-content: center;"><button id="ok-dialog-ok">OK</button></div>
+				<div><button id="ok-dialog-ok">OK</button></div>
 			</dialog>
 
 			<div class="controls" id="controls0">
@@ -150,8 +150,8 @@
 			</div>
 		</section>
 		<section id="container-scroll">
-			<p align="center" style="color: #ffe600; font-size: 12px"><b><i>This is not the Dollchan player!</i> That's <a href="https://dollchan.net/bytebeat/" target="_blank">this one.</b></a> Credits to SthephanShi for making the basis site!</p>
-			<p id="splash" align="center" style="color: #00aeff; font-size: 12px">MissingNo, but it's <i>true!</i></p>
+			<p id="dollchan-warning"><b><i>This is not the Dollchan player!</i> That's <a href="https://dollchan.net/bytebeat/" target="_blank">this one.</b></a> Credits to SthephanShi for making the basis site!</p>
+			<p id="splash">MissingNo, but it's <i>true!</i></p>
 			<details class="library-content">
 				<summary class="library-header">
 					<h1>Info</h1> &ndash; about bytebeat
@@ -190,17 +190,16 @@
 					They are just a novelty, and use them at your own risk. I would remove them (and the exotic modes) if it weren't for compatibility.
 				</article>
 			</details>
-			<!--details class="library-content">
+			<details class="library-content">
 				<summary class="library-header" id="favorites-button">
 					<h1>Favorites &mdash; Codes you saved</h1>
 				</summary>
-				<article id="info" class="library-container entry-top">
-					<div class="controls">New favorite: <input type="text" value="Name" id="favorite-name"><button id="favorite-save">Save</button></div>
-					All favorites are stored as cookies. <warning>Samplerate and mode are not saved, so all favorites load as 8kHz bytebeat.</warning>
-					<div id="favorites-status"></div>
-					<ul id="favorites-contents"></ul>
+				<article id="favorites" class="library-container entry loaded">
+					<div class="controls">New favorite: <input type="text" value="Name" id="favorites-nameinput"><button id="favorites-savefavorite">Save</button></div>
+					<p>All favorites are basically URLs stored as supercookies. These, some Google Analytics cookies added by GitHub Pages, and the settings supercookie are the only things persistently stored on your device.</p>
+					<ul id="favorites-content"></ul>
 				</article>
-			</details-->
+			</details>
 			<details class="library-content">
 				<summary class="library-header">
 					<h1>Classic</h1> &ndash; C-compatible Bytebeat, one variable (t)
@@ -265,6 +264,7 @@
 					<label class="settings-block">
 						<select id="control-theme-style" class="control-select" title="Player theme style">
 							<option value="Default" selected>Default</option>
+							<option value="Dollchan">Dollchan</option>
 							<option value="Blue">Blue</option>
 							<option value="Cake">Cake</option>
 							<option value="Dusk">Dusk</option>

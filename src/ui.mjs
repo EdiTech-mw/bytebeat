@@ -31,6 +31,10 @@ export class UI {
 		this.okDialog = null;
 		this.okDialogText = null;
 		this.okDialogButton = null;
+		this.favoritesNameInput = null;
+		this.favoritesSaveButton = null;
+		this.favoritesList = null;
+		this.downloader = null;
 		this.splashElem = null;
 		this.mainElem = null;
 	}
@@ -73,7 +77,10 @@ export class UI {
 		this.yesNoDialog = document.getElementById('yesno-dialog');
 		this.yesNoDialogText = document.getElementById('yesno-dialog-text');
 		this.yesNoDialogYesButton = document.getElementById('yesno-dialog-yes');
-		this.yesNoDialogNoButton = document.getElementById('yes-dialog-no');
+		this.yesNoDialogNoButton = document.getElementById('yesno-dialog-no');
+		this.favoritesNameInput = document.getElementById('favorites-nameinput');
+		this.favoritesSaveButton = document.getElementById('favorites-savefavorite');
+		this.favoritesList = document.getElementById('favorites-content');
 		this.downloader = document.getElementById('downloader');
 		this.splashElem = document.getElementById('splash');
 		this.mainElem = document.getElementById('content');
@@ -82,7 +89,7 @@ export class UI {
 		this.controlCodeSize.textContent = `${formatBytes(new Blob([value]).size, 1)} (${window.location.href.length}c)`;
 	}
 	okAlert(message, callback){
-		this.okDialogText.textContent = message;
+		this.okDialogText.innerText = message;
 		this.okDialogButton.addEventListener('click',()=>{
 			this.okDialog.close();
 			if(callback) callback();
@@ -90,7 +97,7 @@ export class UI {
 		this.okDialog.showModal();
 	}
 	yesNoAlert(message, callbackYes, callbackNo) {
-		this.yesNoDialogText.textContent = message;
+		this.yesNoDialogText.innerText = message;
 	
 		const onYesClick = () => {
 			this.yesNoDialog.close();
@@ -106,6 +113,7 @@ export class UI {
 	
 		this.yesNoDialogYesButton.addEventListener('click', onYesClick, { once: true });
 		this.yesNoDialogNoButton.addEventListener('click', onNoClick, { once: true });
+		this.yesNoDialog.showModal();
 	}
 	setPlayButton(buttonElem, speed) {
 		const isFast = speed !== 1;

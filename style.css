@@ -287,6 +287,22 @@ html[data-theme="Teal"] {
 
 /* ==[ Common ] =========================================================================================== */
 
+#dollchan-warning {
+	color: #ffe600;
+	font-size: 12px;
+	width: fit-content;
+	margin-inline: auto;
+	text-align: center;
+}
+
+#splash {
+	color: #00aeff;
+	font-size: 16px;
+	width: fit-content;
+	margin-inline: auto;
+	text-align: center;
+}
+
 html {
 	color-scheme: dark;
 	background-color: #000;
@@ -346,6 +362,18 @@ option {
 .alert-dialogs {
 	background-image: var(--dialog-background);
 	font: 24px monospace;
+}
+
+.alert-dialogs > p {
+	width: fit-content;
+	margin-inline: auto;
+	text-align: center;
+}
+
+.alert-dialogs > div {
+	width: fit-content;
+	margin-inline: auto;
+	text-align: center;
 }
 
 /* ==[ Containers ] ======================================================================================= */
@@ -582,6 +610,10 @@ button[name="close"] {
 
 /* ==[ Library ] ========================================================================================== */
 
+#favorites > p {
+	text-align: center;
+}
+
 .code-button {
 	margin: 2px 0;
 	padding: 2px 5px;
@@ -664,7 +696,7 @@ button[name="close"] {
 	color: var(--code-tags);
 }
 
-.code-text {
+.code-text, .favorite-text {
 	display: inline-block;
 	margin: 0;
 	padding: 3px;
@@ -681,7 +713,7 @@ button[name="close"] {
 	cursor: pointer;
 }
 
-.code-text:hover {
+.code-text:hover, .favorite-text:hover {
 	color: #ed88fb !important;
 }
 
