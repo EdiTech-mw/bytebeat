@@ -100,6 +100,7 @@ globalThis.bytebeat = new class {
 			case 'actions-minibake': this.bake(); break;
 			case 'actions-deminibake': this.debake(); break;
 			case 'favorites-savefavorite': this.saveFavorite(); break;
+			case 'favorites-reload': this.loadFavoriteList(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -606,17 +607,19 @@ globalThis.bytebeat = new class {
 		ui.setCodeSize(code);
 		getUrlFromCode(code, this.mode, this.sampleRate);
 	}
+	favoriteErrorBox(error) {
+		ui.yesNoAlert(`${error.message}\n\n${error.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
+			localStorage.favorites="{}";
+			this.loadFavoriteList();
+		},()=>{})
+	}
 	saveFavorite() {
 		this.updateUrl();
 		try {
 			const favorites = JSON.parse(localStorage.favorites??"{}");
-			favorites[encodeURIComponent(`${this.sampleRate} ${this.mode}: ${ui.favoritesNameInput.value}`)] = encodeURIComponent(window.location.hash);
+			favorites[encodeURIComponent(`${this.mode}${this.sampleRate}Hz @ ${ui.controlCodeSize.textContent}: ${ui.favoritesNameInput.value}`)] = encodeURIComponent(window.location.hash);
 			localStorage.favorites = JSON.stringify(favorites);
-		} catch(e) {
-			ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
-				localStorage.favorites="{}";
-			},()=>{})
-		} finally {
+		} catch(e) { this.favoriteErrorBox(e); } finally {
 			this.loadFavoriteList();
 		}
 	}
@@ -637,11 +640,7 @@ globalThis.bytebeat = new class {
 							const favorites = JSON.parse(localStorage.favorites??"{}");
 							delete favorites[encodeURIComponent(decodedName)];
 							localStorage.favorites = JSON.stringify(favorites);
-						} catch(e) {
-							ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
-								localStorage.favorites="{}";
-							},()=>{})
-						} finally {
+						} catch(e) { this.favoriteErrorBox(e); } finally {
 							this.loadFavoriteList();
 						}
 					},()=>{})
@@ -653,17 +652,14 @@ globalThis.bytebeat = new class {
 					this.parseUrl();
 					this.resetTime();
 					this.updateUrl();
+					this.playbackToggle(true);
 					this.setSplashtext();
 				})
-				li_codeSpan.innerText = url;
+				li_codeSpan.innerText = url.length > 2000 ? url.slice(0,1997)+'...' : url;
 				li.appendChild(li_nameButton);
 				li.appendChild(li_codeSpan);
 				ui.favoritesList.appendChild(li);
 			}
-		} catch(e) {
-			ui.yesNoAlert(`${e.message}\n\n${e.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
-				localStorage.favorites="{}";
-			},()=>{})
-		}
+		} catch(e) { this.favoriteErrorBox(e); }
 	}
 }();

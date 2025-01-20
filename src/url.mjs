@@ -13,10 +13,10 @@ export function getCodeFromUrl(hash) {
 		} catch(err) {
 			console.error(`Couldn't load data from url: ${ err }`);
 		}
-	} else if(hash.startsWith('#v3b64')) {
+	} else if(hash.startsWith('#v3b64') || hash.startsWith('#EnBeat2-')) {
 		try {
 			songData = inflateRaw(
-				Uint8Array.from(atob(hash.substring(6)), el => el.charCodeAt()), { to: 'string' });
+				Uint8Array.from(atob(hash.substring(hash.startsWith('#EnBeat2-') ? 9 : 6)), el => el.charCodeAt()), { to: 'string' });
 			if(songData.startsWith('{')) {
 				songData = JSON.parse(songData);
 				if(songData.formula) { // XXX: old format

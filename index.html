@@ -195,7 +195,11 @@
 					<h1>Favorites &mdash; Codes you saved</h1>
 				</summary>
 				<article id="favorites" class="library-container entry loaded">
-					<div class="controls">New favorite: <input type="text" value="Name" id="favorites-nameinput"><button id="favorites-savefavorite">Save</button></div>
+					<div class="controls">
+						<button id="favorites-reload">Reload list</button>
+						<span>New favorite:</span> <input type="text" value="Name" id="favorites-nameinput">
+						<button id="favorites-savefavorite">Save</button>
+					</div>
 					<p>All favorites are basically URLs stored as supercookies. These, some Google Analytics cookies added by GitHub Pages, and the settings supercookie are the only things persistently stored on your device.</p>
 					<ul id="favorites-content"></ul>
 				</article>

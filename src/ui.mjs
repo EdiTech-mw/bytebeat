@@ -33,6 +33,7 @@ export class UI {
 		this.okDialogButton = null;
 		this.favoritesNameInput = null;
 		this.favoritesSaveButton = null;
+		this.favoritesReloadButton = null;
 		this.favoritesList = null;
 		this.downloader = null;
 		this.splashElem = null;
@@ -80,6 +81,7 @@ export class UI {
 		this.yesNoDialogNoButton = document.getElementById('yesno-dialog-no');
 		this.favoritesNameInput = document.getElementById('favorites-nameinput');
 		this.favoritesSaveButton = document.getElementById('favorites-savefavorite');
+		this.favoritesReloadButton = document.getElementById('favorites-reload');
 		this.favoritesList = document.getElementById('favorites-content');
 		this.downloader = document.getElementById('downloader');
 		this.splashElem = document.getElementById('splash');
