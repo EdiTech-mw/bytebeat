@@ -43,6 +43,7 @@
 	--link: #89c2ff;
 	--link-hover: #3fe2e2 !important;
 	--dialog-background: linear-gradient(to bottom,#000,#050);
+	--dialog-border: #5dfd57;
 }
 
 html[data-theme="Dollchan"] {
@@ -66,7 +67,8 @@ html[data-theme="Dollchan"] {
 	--focus: #614fdb;
 	--library-header: linear-gradient(to bottom, #202c46, #0b0d17);
 	--library-header-hover: linear-gradient(to bottom, #32426c, #151b2b);
-	--dialog-background: linear-gradient(to bottom, #181f33, #67789d);
+	--dialog-background: linear-gradient(to bottom,#313031,#505760);
+	--dialog-border: #aeaeae;
 }
 
 html[data-theme="Blue"] {
@@ -90,6 +92,7 @@ html[data-theme="Blue"] {
 	--library-header: linear-gradient(to bottom, #2c3e6a, #101420);
 	--library-header-hover: linear-gradient(to bottom, #405588, #192035);
 	--dialog-background: linear-gradient(to bottom, #181f33, #4567b0);
+	--dialog-border: #5183ee;
 }
 
 html[data-theme="Cake"] {
@@ -119,6 +122,7 @@ html[data-theme="Cake"] {
 	--library-header-hover: linear-gradient(to bottom, #ee58c9, #004950);
 	--library-header-hover-color: #94fbff;
 	--dialog-background: linear-gradient(to bottom, #b825a2, #259096);
+	--dialog-border: #fb79ff;
 	--link: #88eafb;
 	--link-hover: #ff89ed !important;
 }
@@ -148,6 +152,7 @@ html[data-theme="Dusk"] {
 	--library-header-hover: linear-gradient(to bottom, #303048, #606096);
 	--library-header-hover-color: #d0d0f0;
 	--dialog-background: linear-gradient(to bottom, #202030, #606095);
+	--dialog-border: #8080c0;
 	--link: #8080c0;
 	--link-hover: #c0c0f0 !important;
 }
@@ -203,6 +208,7 @@ html[data-theme="Orange"] {
 	--library-header-hover: linear-gradient(to bottom, #f58004, #3b260d);
 	--library-header-hover-color: #ffffa5;
 	--dialog-background: linear-gradient(to bottom, #2b2016, #9c5416);
+	--dialog-border: #ffa743;
 	--link: #ff998e;
 }
 
@@ -228,6 +234,7 @@ html[data-theme="Purple"] {
 	--library-header: linear-gradient(to bottom, #432046, #170b16);
 	--library-header-hover: linear-gradient(to bottom, #65326c, #2b152a);
 	--dialog-background: linear-gradient(to bottom, #2b152a, #65326c);
+	--dialog-border: #c765bf;
 	--link: #ca89ff;
 	--link-hover: #94c7ff !important;
 }
@@ -257,6 +264,7 @@ html[data-theme="Teal"] {
 	--library-header-hover: linear-gradient(to bottom, #3c9fa2, #214a4a);
 	--library-header-hover-color: #94fbff;
 	--dialog-background: linear-gradient(to bottom, #214a4a, #3c9fa2);
+	--dialog-border: #60dfdf;
 	--link: #8efbff;
 }
 
@@ -361,7 +369,9 @@ option {
 
 .alert-dialogs {
 	background-image: var(--dialog-background);
-	font: 24px monospace;
+	font-size: 24px;
+	border: 4px solid var(--dialog-border);
+	border-radius: 16px;
 }
 
 .alert-dialogs > p {
@@ -812,7 +822,7 @@ button[name="close"] {
 
 /* ==[ Controls ] ========================================================================================= */
 
-.control-button, .control-select {
+.control-button, .control-select, .control-label {
 	height: var(--control-size);
 	padding: 0;
 	border: none;
@@ -820,6 +830,9 @@ button[name="close"] {
 	background-image: var(--control-button);
 	color: #e3e3e3;
 	font: bold var(--font-size)/var(--control-size) sans-serif;
+}
+
+.control-button, .control-select {
 	cursor: pointer;
 }
 
@@ -828,7 +841,7 @@ button[name="close"] {
 	cursor: default;
 }
 
-.control-text-button {
+.control-text-button, .control-label {
 	padding: 0 10px 0 10px !important
 }
 

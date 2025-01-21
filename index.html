@@ -27,11 +27,14 @@
 			</dialog>
 			<dialog class="alert-dialogs" id="yesno-dialog">
 				<p id="yesno-dialog-text">Yes or no?</p>
-				<div><button id="yesno-dialog-yes">Yes</button><button id="yesno-dialog-no">No</button></div>
+				<div class="controls-group">
+					<button id="yesno-dialog-yes" class="control-button control-text-button">Yes</button>
+					<button id="yesno-dialog-no" class="control-button control-text-button">No</button>
+				</div>
 			</dialog>
 			<dialog class="alert-dialogs" id="ok-dialog">
 				<p id="ok-dialog-text">Alert!</p>
-				<div><button id="ok-dialog-ok">OK</button></div>
+				<div><button id="ok-dialog-ok" class="control-button control-text-button">OK</button></div>
 			</dialog>
 
 			<div class="controls" id="controls0">
@@ -192,13 +195,15 @@
 			</details>
 			<details class="library-content">
 				<summary class="library-header" id="favorites-button">
-					<h1>Favorites &mdash; Codes you saved</h1>
+					<h1>Favorites</h1> &ndash; Codes you saved
 				</summary>
 				<article id="favorites" class="library-container entry loaded">
 					<div class="controls">
-						<button id="favorites-reload">Reload list</button>
-						<span>New favorite:</span> <input type="text" value="Name" id="favorites-nameinput">
-						<button id="favorites-savefavorite">Save</button>
+						<button id="favorites-reload" class="control-button control-text-button">Reload list</button>
+						<div class="controls-group controls-grow">
+							<button id="favorites-savefavorite" class="control-button control-text-button">New favorite:</button>
+							<input type="text" value="Name" id="favorites-nameinput" class="control-text"/>
+						</div>
 					</div>
 					<p>All favorites are basically URLs stored as supercookies. These, some Google Analytics cookies added by GitHub Pages, and the settings supercookie are the only things persistently stored on your device.</p>
 					<ul id="favorites-content"></ul>
@@ -311,7 +316,7 @@
 					</label>
 					<label class="settings-block">
 						Audio sample rate:&nbsp;&nbsp;
-						<div class="controls-group controls-grow" width="128">
+						<div class="controls-group controls-grow">
 							<input value="48000" type="number" id="settings-audiorate" class="control-text" title="Set audio sample rate and click &quot;Apply&quot;">
 							<button id="settings-audiorate-apply" class="control-button control-text-button">Apply</button>
 						</div>

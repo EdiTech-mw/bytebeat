@@ -648,35 +648,53 @@ globalThis.bytebeat = new class {
 				const decodedName = decodeURIComponent(i);
 				const url = decodeURIComponent(favorites[i]);
 				const li = document.createElement('li');
-				const li_nameButton = document.createElement('button');
-				li_nameButton.textContent = `${decodedName}`;
-				li_nameButton.classList.add("favorites-delete");
-				li_nameButton.addEventListener('click',()=>{
-					ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
-						try {
-							const favorites = JSON.parse(localStorage.favorites??"{}");
-							delete favorites[encodeURIComponent(decodedName)];
-							localStorage.favorites = JSON.stringify(favorites);
-						} catch(e) { this.favoriteErrorBox(e); } finally {
-							this.loadFavoriteList();
-						}
-					},()=>{})
-				})
-				const li_codeSpan = document.createElement('span');
-				li_codeSpan.classList.add('favorite-text');
-				li_codeSpan.addEventListener('click',()=>{
-					window.location.hash = url;
-					this.parseUrl();
-					this.resetTime();
-					this.updateUrl();
-					this.playbackToggle(true);
-					this.setSplashtext();
-				})
-				li_codeSpan.innerText = url.length > 2000 ? url.slice(0,1997)+'...' : url;
-				li.appendChild(li_nameButton);
-				li.appendChild(li_codeSpan);
+					const li_infoGroup = document.createElement('div');
+						const ig_nameSpan = document.createElement('span');
+							ig_nameSpan.textContent = `${decodedName}`;
+							ig_nameSpan.classList.add("control-label");
+						li_infoGroup.appendChild(ig_nameSpan);
+						const ig_infoSpan = document.createElement('span');
+							ig_infoSpan.textContent = `info n/a`;
+							ig_infoSpan.classList.add("control-label");
+						li_infoGroup.appendChild(ig_infoSpan);
+					li.appendChild(li_infoGroup);
+
+					const li_controlGroup = document.createElement('div');
+					// li_controlGroup.classList.add("controls-group");
+						const cg_deleteButton = document.createElement('button');
+						cg_deleteButton.textContent = "Delete";
+						cg_deleteButton.classList.add("control-button", "control-text-button", "favorite-delete");
+						cg_deleteButton.addEventListener('click',()=>{
+							ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
+								try {
+									const favorites = JSON.parse(localStorage.favorites??"{}");
+									delete favorites[encodeURIComponent(decodedName)];
+									localStorage.favorites = JSON.stringify(favorites);
+								} catch(e) { this.favoriteErrorBox(e); } finally {
+									this.loadFavoriteList();
+								}
+							},()=>{})
+						})
+						li_controlGroup.appendChild(cg_deleteButton);
+					li.appendChild(li_controlGroup);
+
+					const li_codeSpan = document.createElement('span');
+						li_codeSpan.classList.add('favorite-text');
+						li_codeSpan.addEventListener('click',()=>{
+							window.location.hash = url;
+							this.parseUrl();
+							this.resetTime();
+							this.updateUrl();
+							this.playbackToggle(true);
+							this.setSplashtext();
+						})
+						li_codeSpan.innerText = url.length > 2000 ? url.slice(0,1997)+'...' : url;
+					li.appendChild(li_codeSpan);
+
 				ui.favoritesList.appendChild(li);
+				ui.favoritesList.appendChild(document.createElement('hr'));
 			}
+			ui.favoritesList.removeChild(ui.favoritesList.children[ui.favoritesList.children.length-1]); // Remove that last hr
 		} catch(e) { this.favoriteErrorBox(e); }
 	}
 }();
