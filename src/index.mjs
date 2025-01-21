@@ -5,6 +5,7 @@ import { UI } from './ui.mjs';
 import { getCodeFromUrl, getUrlFromCode } from './url.mjs';
 import { Actions } from './actions.mjs';
 import { splashes } from './splashes.mjs';
+import { formatBytes } from './utils.mjs';
 
 const editor = new Editor();
 const library = new Library();
@@ -633,8 +634,16 @@ globalThis.bytebeat = new class {
 	saveFavorite() {
 		this.updateUrl();
 		try {
-			const favorites = JSON.parse(localStorage.favorites??"{}");
-			favorites[encodeURIComponent(`${this.mode}${this.sampleRate}Hz @ ${ui.controlCodeSize.textContent}: ${ui.favoritesNameInput.value}`)] = encodeURIComponent(window.location.hash);
+			const favorites = JSON.parse(localStorage.favorites??"[]");
+			favorites.push({
+				name: ui.favoritesNameInput.value,
+				info: {
+					mode: this.mode,
+					samplerate: this.sampleRate,
+					size: new Blob([editor.value]).size
+				},
+				url: window.location.hash
+			});
 			localStorage.favorites = JSON.stringify(favorites);
 		} catch(e) { this.favoriteErrorBox(e); } finally {
 			this.loadFavoriteList();
@@ -642,59 +651,168 @@ globalThis.bytebeat = new class {
 	}
 	loadFavoriteList() {
 		try {
-			const favorites = JSON.parse(localStorage.favorites??"{}");
+			const favorites = JSON.parse(localStorage.favorites??"[]");
+			if(!Array.isArray(favorites)) {
+				let newFavorites = [];
+				for(let i in favorites) {
+					let newFavorite = {};
+					newFavorite.name = decodeURIComponent(i).split(': ').slice(1).join(': ');
+					newFavorite.info = decodeURIComponent(i).split(': ')[0];
+					newFavorite.url = decodeURIComponent(favorites[i]);
+					newFavorites.push(newFavorite)
+				}
+				localStorage.favorites = JSON.stringify(newFavorites);
+				ui.okAlert("Your favorites have been converted!",()=>this.loadFavoriteList());
+				return;
+			}
 			while(ui.favoritesList.children.length > 0) ui.favoritesList.removeChild(ui.favoritesList.children[0]); // sacrifice to Armok
 			for(let i in favorites) {
-				const decodedName = decodeURIComponent(i);
-				const url = decodeURIComponent(favorites[i]);
+				i=+i; // It saves your sanity.
+				const favorite = favorites[i];
 				const li = document.createElement('li');
 					const li_infoGroup = document.createElement('div');
 						const ig_nameSpan = document.createElement('span');
-							ig_nameSpan.textContent = `${decodedName}`;
+							ig_nameSpan.textContent = favorite.name;
 							ig_nameSpan.classList.add("control-label");
 						li_infoGroup.appendChild(ig_nameSpan);
 						const ig_infoSpan = document.createElement('span');
-							ig_infoSpan.textContent = `info n/a`;
+							if(typeof favorite.info === 'string') {
+								ig_infoSpan.textContent = favorite.info
+							} else {
+								ig_infoSpan.textContent = `${favorite.info.mode}${favorite.info.samplerate}Hz @ ${formatBytes(favorite.info.size)}`
+							}
 							ig_infoSpan.classList.add("control-label");
 						li_infoGroup.appendChild(ig_infoSpan);
 					li.appendChild(li_infoGroup);
 
-					const li_controlGroup = document.createElement('div');
-					// li_controlGroup.classList.add("controls-group");
-						const cg_deleteButton = document.createElement('button');
-						cg_deleteButton.textContent = "Delete";
-						cg_deleteButton.classList.add("control-button", "control-text-button", "favorite-delete");
-						cg_deleteButton.addEventListener('click',()=>{
-							ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
-								try {
-									const favorites = JSON.parse(localStorage.favorites??"{}");
-									delete favorites[encodeURIComponent(decodedName)];
-									localStorage.favorites = JSON.stringify(favorites);
-								} catch(e) { this.favoriteErrorBox(e); } finally {
-									this.loadFavoriteList();
-								}
-							},()=>{})
-						})
-						li_controlGroup.appendChild(cg_deleteButton);
-					li.appendChild(li_controlGroup);
+
 
 					const li_codeSpan = document.createElement('span');
 						li_codeSpan.classList.add('favorite-text');
 						li_codeSpan.addEventListener('click',()=>{
-							window.location.hash = url;
+							window.location.hash = favorite.url;
 							this.parseUrl();
 							this.resetTime();
 							this.updateUrl();
 							this.playbackToggle(true);
 							this.setSplashtext();
 						})
-						li_codeSpan.innerText = url.length > 2000 ? url.slice(0,1997)+'...' : url;
+						li_codeSpan.innerText = favorite.url.length > 2000 ? favorite.url.slice(0,1997)+'...' : favorite.url;
 					li.appendChild(li_codeSpan);
+
+
+
+					const li_controls = document.createElement('div');
+					li_controls.classList.add("controls");
+						const c_controlGroup0 = document.createElement('div');
+						c_controlGroup0.classList.add("controls-group");
+							const cg0_deleteButton = document.createElement('button');
+							cg0_deleteButton.textContent = "Delete";
+							cg0_deleteButton.classList.add("control-button", "control-text-button");
+							cg0_deleteButton.addEventListener('click',()=>{
+								ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
+									try {
+										let favorites = JSON.parse(localStorage.favorites??"[]");
+										favorites.splice(i,1);
+										localStorage.favorites = JSON.stringify(favorites);
+									} catch(e) { this.favoriteErrorBox(e); } finally {
+										this.loadFavoriteList();
+									}
+								},()=>{})
+							})
+							c_controlGroup0.appendChild(cg0_deleteButton);
+
+							const cg0_overwriteButton = document.createElement('button');
+							cg0_overwriteButton.textContent = "Overwrite";
+							cg0_overwriteButton.classList.add("control-button", "control-text-button");
+							cg0_overwriteButton.addEventListener('click',()=>{
+								ui.yesNoAlert("Are you sure you want to overwrite this favorite?",()=>{
+									try {
+										let favorites = JSON.parse(localStorage.favorites??"[]");
+										this.updateUrl();
+										favorites[i] = {
+											name: favorites[i].name,
+											info: {
+												mode: this.mode,
+												samplerate: this.sampleRate,
+												size: new Blob([editor.value]).size
+											},
+											url: window.location.hash
+										};
+										localStorage.favorites = JSON.stringify(favorites);
+									} catch(e) { this.favoriteErrorBox(e); } finally {
+										this.loadFavoriteList();
+									}
+								},()=>{})
+							})
+							c_controlGroup0.appendChild(cg0_overwriteButton);
+
+							const cg0_renameButton = document.createElement('button');
+							cg0_renameButton.textContent = "Rename";
+							cg0_renameButton.classList.add("control-button", "control-text-button");
+							cg0_renameButton.addEventListener('click',()=>{
+								ui.yesNoAlert("Are you sure you want to rename this favorite to what's in the \"New favorite\" bar?",()=>{
+									try {
+										let favorites = JSON.parse(localStorage.favorites??"[]");
+										this.updateUrl();
+										favorites[i].name = ui.favoritesNameInput.value;
+										localStorage.favorites = JSON.stringify(favorites);
+									} catch(e) { this.favoriteErrorBox(e); } finally {
+										this.loadFavoriteList();
+									}
+								},()=>{})
+							})
+							c_controlGroup0.appendChild(cg0_renameButton);
+
+						li_controls.appendChild(c_controlGroup0);
+
+
+						const c_controlGroup1 = document.createElement('div');
+						c_controlGroup1.classList.add("controls-group");
+							const cg1_upButton = document.createElement('button');
+								cg1_upButton.textContent = "Up";
+								cg1_upButton.disabled = i < 1;
+								cg1_upButton.classList.add("control-button", "control-text-button", "favorite-delete");
+								cg1_upButton.addEventListener('click',()=>{
+									try {
+										let favorites = JSON.parse(localStorage.favorites??"[]");
+										const upper = favorites[i-1];
+										const lower = favorites[i];
+										favorites[i-1] = lower;
+										favorites[i] = upper;
+										localStorage.favorites = JSON.stringify(favorites);
+									} catch(e) { this.favoriteErrorBox(e); } finally {
+										this.loadFavoriteList();
+									}
+								})
+							c_controlGroup1.appendChild(cg1_upButton);
+
+							const cg1_downButton = document.createElement('button');
+								cg1_downButton.textContent = "Down";
+								cg1_downButton.disabled = i > (favorites.length - 2);
+								cg1_downButton.classList.add("control-button", "control-text-button", "favorite-delete");
+								cg1_downButton.addEventListener('click',()=>{
+									try {
+										let favorites = JSON.parse(localStorage.favorites??"[]");
+										const upper = favorites[i];
+										const lower = favorites[i+1];
+										favorites[i] = lower;
+										favorites[i+1] = upper;
+										localStorage.favorites = JSON.stringify(favorites);
+									} catch(e) { this.favoriteErrorBox(e); } finally {
+										this.loadFavoriteList();
+									}
+								})
+							c_controlGroup1.appendChild(cg1_downButton);
+						li_controls.appendChild(c_controlGroup1);
+					li.appendChild(li_controls);
+
+
 
 				ui.favoritesList.appendChild(li);
 				ui.favoritesList.appendChild(document.createElement('hr'));
 			}
-			ui.favoritesList.removeChild(ui.favoritesList.children[ui.favoritesList.children.length-1]); // Remove that last hr
+			if(ui.favoritesList.children.length > 0) ui.favoritesList.removeChild(ui.favoritesList.children[ui.favoritesList.children.length-1]); // Remove that last hr
 		} catch(e) { this.favoriteErrorBox(e); }
 	}
 }();
