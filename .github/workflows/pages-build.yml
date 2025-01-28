@@ -57,7 +57,7 @@ jobs:
           cp build/audio-processor.mjs artifactRoot/build/
 
       - name: Copy library
-        id: copy-static
+        id: copy-library
         run: |
           cp -rv data/library/ artifactRoot/data/
           cp -rv data/songs/ artifactRoot/data/
