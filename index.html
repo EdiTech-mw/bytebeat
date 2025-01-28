@@ -12,7 +12,7 @@
 	<link rel="modulepreload" href="./build/audio-processor.mjs">
 	<script type="module" async src="./build/index.js"></script>
 </head>
-<body>	
+<body>
 <div id="log"></div>
 	<main id="content">
 		<section id="container-fixed">
@@ -324,6 +324,9 @@
 					<p>The song's samplerate is upscaled/downscaled (block resampling!) to this samplerate. 48000 or above is recommended, likely some multiple of 48000.<br>
 					Be warned: The higher you put this, the more powerful your computer is expected to be!<br>
 				    You need to stay in the range [8000, 192000]. <b>Keep in mind that 48000 covers all frequencies you will be able to hear,</b> you only need to turn it up if you want to go ultrasonic.</p>
+					<label class="settings-block">
+						<a href="bytebeat.php?manage" title="You will be disappointed if you're clicking this link on prod. It won't work.">Manage library (only works in devEnv)</a>
+					</label>
 				</article>
 			</details>
 			<details class="library-content">
