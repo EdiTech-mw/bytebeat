@@ -5,8 +5,8 @@ export class Library {
 	constructor() {
 		this.cacheParentElem = null;
 		this.cacheTextElem = null;
-		this.pathFiles = 'https://dollchan.net/bytebeat/data/songs/';
-		this.pathLibrary = 'https://dollchan.net/bytebeat/data/library/';
+		this.pathFiles = './data/songs/';
+		this.pathLibrary = './data/library/';
 		this.showAllSongs = false;
 		this.songs = null;
 
@@ -61,7 +61,7 @@ export class Library {
 			return `<details class="songs-block"${
 				notAllLib || this.showAllSongs ? ' open' : ''
 			}><summary class="songs-header"> <b>${ author }</b>${
-				author === 'SthephanShi' ? '<small style="color: #ff0;">dollchan creator</small>' : author === 'Chasyxx' ? '<small style="color: #0f0;">site creator</small>' : '' }${
+				author === 'SthephanShi' ? '<small style="color: #ff0;">dollchan creator</small>' : '' }${
 				len ? `<small> ${ len } song${ len > 1 ? 's' : '' }</small>` : ''
 			}</summary><div class="songs">${ songsStr }</div></details>`;
 		}
@@ -175,8 +175,8 @@ export class Library {
 			buttonElem.insertAdjacentHTML('beforeend',
 				'<svg class="loading-wait"><use xlink:href="#symbol-wait"></use></svg>');
 			const waitElem = buttonElem.lastChild;
-			const response = await fetch("https://corsproxy.io/"+encodeURIComponent(this.pathFiles + buttonElem.dataset.type +
-				'/' + buttonElem.dataset.codeFile));
+			const response = await fetch(this.pathFiles + buttonElem.dataset.type +
+				'/' + buttonElem.dataset.codeFile);
 			globalThis.bytebeat.loadCode(Object.assign(JSON.parse(buttonElem.dataset.songdata),
 				{ code: await response.text() }));
 			waitElem.remove();
@@ -198,7 +198,7 @@ export class Library {
 		const waitElem = headerElem.querySelector('.loading-wait');
 		waitElem.classList.remove('hidden');
 		const libName = containerElem.id.replace('library-', '');
-		const response = await fetch("https://corsproxy.io/"+encodeURIComponent(this.pathLibrary + libName + '.gz'));
+		const response = await fetch(this.pathLibrary + libName + '.gz');
 		const { status } = response;
 		if(status !== 200 && status !== 304) {
 			state.remove('loaded');
@@ -231,7 +231,7 @@ export class Library {
 		if(!this.songs) {
 			elem.insertAdjacentHTML('beforeend',
 				'<svg class="loading-wait"><use xlink:href="#symbol-wait"></use></svg>');
-			const response = await fetch("https://corsproxy.io/"+encodeURIComponent(this.pathLibrary + 'all.gz'));
+			const response = await fetch(this.pathLibrary + 'all.gz');
 			this.cacheSongs(JSON.parse(ungzip(await response.arrayBuffer(), { to: 'string' })));
 			elem.lastChild.remove();
 		}

@@ -38,7 +38,7 @@ export function getUrlFromCode(code, mode, sampleRate) {
 	const codeArr = deflateRaw(code);
 	// First byte is mode, next 4 bytes is sampleRate, then the code
 	const outputArr = new Uint8Array(5 + codeArr.length);
-	outputArr[0] = ['Bytebeat', 'Signed Bytebeat', 'Floatbeat', 'Funcbeat', 'null', 'null', 'null', 'null', 'Bitbeat', '2048', 'logmode', 'loghack', 'loghack2'].indexOf(mode);
+	outputArr[0] = ['Bytebeat', 'Signed Bytebeat', 'Floatbeat', 'Funcbeat'].indexOf(mode);
 	outputArr.set(new Uint8Array(new Float32Array([sampleRate]).buffer), 1);
 	outputArr.set(codeArr, 5);
 	window.location.hash = '4' + btoa(String.fromCharCode.apply(null, outputArr)).replaceAll('=', '');
