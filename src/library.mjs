@@ -61,7 +61,8 @@ export class Library {
 			return `<details class="songs-block"${
 				notAllLib || this.showAllSongs ? ' open' : ''
 			}><summary class="songs-header"> <b>${ author }</b>${
-				author === 'SthephanShi' ? '<small style="color: #ff0;">dollchan creator</small>' : '' }${
+				author === 'SthephanShi' ? '<small style="color: #ff0;">dollchan creator</small>' :
+				author === 'Chasyxx' ? '<small style="color: #0f0;">site creator</small>' : '' }${
 				len ? `<small> ${ len } song${ len > 1 ? 's' : '' }</small>` : ''
 			}</summary><div class="songs">${ songsStr }</div></details>`;
 		}
