@@ -4,7 +4,7 @@ name: Build and deploy JS files
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -19,18 +19,22 @@ jobs:
       - name: Update APT
         id: update-apt
         run: sudo apt-get update
-        
+
       - name: Install Node.JS and NPM
         id: install-packages
         run: sudo apt-get install nodejs npm
 
       # Runs a set of commands using the runners shell
+      # - /
+      # - /build/ - JS blobs
+      # - /data/ - Library data
       - name: Create artifact root
         id: create-root
         run: |
           mkdir artifactRoot
           mkdir artifactRoot/build
-          
+          mkdir artifactRoot/data
+
       - name: Copy static files
         id: copy-static
         run: |
@@ -51,6 +55,12 @@ jobs:
         run: |
           cp build/index.js artifactRoot/build/
           cp build/audio-processor.mjs artifactRoot/build/
+
+      - name: Copy library
+        id: copy-static
+        run: |
+          cp -rv data/library/ artifactRoot/data/
+          cp -rv data/songs/ artifactRoot/data/
 
       - name: Create artifact
         id: create-artifact
