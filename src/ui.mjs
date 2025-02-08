@@ -92,11 +92,12 @@ export class UI {
 		this.mainElem = document.getElementById('content');
 	}
 	setCodeSize(value) {
-		this.controlCodeSize.textContent = `${formatBytes(new Blob([value]).size, 1)} (${window.location.href.length}c)`;
+		this.controlCodeSize.textContent =
+			`${ formatBytes(new Blob([value]).size, 1) } (${ window.location.href.length }c)`;
 	}
 	okAlert(message, callback){
 		this.okDialogText.innerText = message;
-		this.okDialogButton.addEventListener('click',()=>{
+		this.okDialogButton.addEventListener('click', () => {
 			this.okDialog.close();
 			if(callback) callback();
 		}, { once: true });
@@ -104,19 +105,19 @@ export class UI {
 	}
 	yesNoAlert(message, callbackYes, callbackNo) {
 		this.yesNoDialogText.innerText = message;
-	
+
 		const onYesClick = () => {
 			this.yesNoDialog.close();
 			callbackYes();
 			this.yesNoDialogNoButton.removeEventListener('click', onNoClick);
 		};
-	
+
 		const onNoClick = () => {
 			this.yesNoDialog.close();
 			callbackNo();
 			this.yesNoDialogYesButton.removeEventListener('click', onYesClick);
 		};
-	
+
 		this.yesNoDialogYesButton.addEventListener('click', onYesClick, { once: true });
 		this.yesNoDialogNoButton.addEventListener('click', onNoClick, { once: true });
 		this.yesNoDialog.showModal();

@@ -5,7 +5,8 @@ import { UI } from './ui.mjs';
 import { getCodeFromUrl, getUrlFromCode } from './url.mjs';
 import { Actions } from './actions.mjs';
 import { splashes } from './splashes.mjs';
-import { formatBytes } from './utils.mjs';
+
+import { FavoriteGenerator } from './generator.mjs';
 
 const editor = new Editor();
 const library = new Library();
@@ -44,6 +45,7 @@ globalThis.bytebeat = new class {
 		this.sampleRate = 8000;
 		this.settings = this.defaultSettings;
 		this.expectedDomain = 'chasyxx';
+		this.startError = null;
 		this.init();
 	}
 	handleEvent(e) {
@@ -103,7 +105,8 @@ globalThis.bytebeat = new class {
 			case 'actions-deminibake': this.debake(); break;
 			case 'favorites-savefavorite': this.saveFavorite(); break;
 			case 'favorites-reload': this.loadFavoriteList(); break;
-			case 'settings-audiorate-apply': this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
+			case 'settings-audiorate-apply':
+				this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -154,22 +157,54 @@ globalThis.bytebeat = new class {
 		}
 		this.setThemeStyle();
 		this.setAudioSampleRate();
-		await this.initAudio();
+		try {
+			await this.initAudio();
+		} catch(e) {
+			this.startError = [ 'audioRate', e ];
+			this.settings.audioSampleRate = 48000;
+			this.saveSettings();
+			try {
+				await this.initAudio();
+			} catch(e) {
+				this.startError = [ 'audioInit', e ];
+			}
+		}
 		if(document.readyState === 'loading') {
 			document.addEventListener('DOMContentLoaded', () => this.initAfterDom());
 			return;
 		}
 		this.initAfterDom();
-		this.loadFavoriteList();
-		this.setSplashtext();
-		if(!window.location.hostname.includes(this.expectedDomain) && !window.location.hostname.startsWith("127.") && !window.location.hostname.includes("local")) {
-			ui.okAlert(
-				`[ALERT]\n\nThe expected domain '${this.expectedDomain}' was not found.\nWhile this site might just be a skid of '${this.expectedDomain}' (try looking up '${this.expectedDomain} bytebeat player'),\nthis site has softened up from before and will still let you use it.\nHopefully you find the original. Hope for the best.\n\n - Creator of ${this.expectedDomain} bytebeat player`)
+	}
+	handleError(z) {
+		const M = z ? $ => {
+			window.alert(
+				$ +
+				'\n\n(This is an emergency error handler as the regular error handler failed. ' +
+				'It means either it, or the code editor & UI setup faled. '+
+				'I recommend you refresh the page.)'
+			);
+		} : $ => {
+			ui.okAlert($);
+		};
+		if(this.startError) {
+			switch(this.startError[0]) {
+			case 'audioRate': M(
+				`${ this.startError[1].message }\n\nWe've reset your samplerate to 48000!`); break;
+			case 'audioInit': M(
+				`We encountered a CRITICAL ERROR starting audio!\n\n${ this.startError[1].stack }`); break;
+			default: M(this.startError[1].stack); break;
+			}
 		}
 	}
 	initAfterDom() {
-		editor.init();
-		ui.initElements();
+		try {
+			editor.init();
+			ui.initElements();
+			this.handleError(0);
+		} catch(e) {
+			this.handleError(1);
+			window.alert('The emergency handler was triggered by:\n\n' + (e.stack ?? e));
+		}
 		scope.initElements();
 		library.initElements();
 		this.setVolume(true);
@@ -191,9 +226,26 @@ globalThis.bytebeat = new class {
 		ui.containerFixed.addEventListener('input', this);
 		ui.containerFixed.addEventListener('keydown', this);
 		ui.containerScroll.addEventListener('mouseover', this);
+		this.loadFavoriteList();
+		this.setSplashtext();
+		if(!window.location.hostname.includes(this.expectedDomain) &&
+		!window.location.hostname.startsWith('127.') &&
+		!window.location.hostname.startsWith('::1') &&
+		!window.location.hostname.includes('local')) {
+			ui.okAlert(
+				`[ALERT]\n\nThe expected domain '${ this.expectedDomain }' was not found.\n` +
+				`While this site might just be a skid of '${ this.expectedDomain }'` +
+				`(try looking up '${ this.expectedDomain } bytebeat player'),\n` +
+				'this site has softened up from before and will still let you use it.\n' +
+				'Hopefully you find the original. Hope for the best.\n\n' +
+				` - Creator of ${ this.expectedDomain } bytebeat player`);
+		}
 	}
 	async initAudio() {
-		this.audioCtx = new AudioContext({ latencyHint: 'balanced', sampleRate: this.settings.audioSampleRate });
+		this.audioCtx = new AudioContext({
+			latencyHint: 'balanced',
+			sampleRate: this.settings.audioSampleRate
+		});
 		this.audioGain = new GainNode(this.audioCtx);
 		this.audioGain.connect(this.audioCtx.destination);
 		await this.audioCtx.audioWorklet.addModule('./build/audio-processor.mjs');
@@ -224,8 +276,11 @@ globalThis.bytebeat = new class {
 		this.audioGain.connect(mediaDest);
 	}
 	setSplashtext() {
-		if(!window.location.hostname.includes(this.expectedDomain) && !window.location.hostname.startsWith("127.") && !window.location.hostname.includes("local")) 
-			ui.splashElem.innerHTML = "Featuring the Disturbance in the Force!";
+		if(!window.location.hostname.includes(this.expectedDomain) &&
+		!window.location.hostname.startsWith('127.') &&
+		!window.location.hostname.startsWith('::1') &&
+		!window.location.hostname.includes('local'))
+			ui.splashElem.innerHTML = 'Featuring the Disturbance in the Force!';
 		else ui.splashElem.innerHTML = splashes[Math.random()*splashes.length|0];
 	}
 	loadCode({ code, sampleRate, mode, drawMode, scale }, isPlay = true) {
@@ -443,9 +498,6 @@ globalThis.bytebeat = new class {
 	}
 	setAudioSampleRate(value) {
 		if(value !== undefined) {
-			if(value < 8000 || value > 192000) {
-				value = 48000;
-			}
 			this.settings.audioSampleRate = value;
 			this.saveSettings();
 			window.location.reload();
@@ -596,29 +648,29 @@ globalThis.bytebeat = new class {
 		const code1 = editor.value;
 		const data = actions.commaFormat(code1);
 		if(data.error) {
-			ui.okAlert(`Format failed: ${data.error}!`);
+			ui.okAlert(`Format failed: ${ data.error }!`);
 			return;
 		}
-		editor.setValue(data.code)
+		editor.setValue(data.code);
 	}
 	bake() {
-		let toEncode = editor.value;
+		const toEncode = editor.value;
 
-		if (actions.unminibakeCode(toEncode)!==toEncode) {
-			ui.okAlert("Code is already minibaked.");
+		if(actions.unminibakeCode(toEncode)!==toEncode) {
+			ui.okAlert('Code is already minibaked.');
 			return;
 		}
 
-		const l = actions.minibakeCode(toEncode)
-		if (actions.unminibakeCode(l) !== l) {
+		const l = actions.minibakeCode(toEncode);
+		if(actions.unminibakeCode(l) !== l) {
 			editor.setValue(l);
 		} else {
-			ui.okAlert("Minibaking reverted: the player will lag!");
+			ui.okAlert('Minibaking reverted: the player will lag!');
 		}
 		return;
 	}
-	debake() {	
-		editor.setValue(actions.unminibakeCode(editor.value))
+	debake() {
+		editor.setValue(actions.unminibakeCode(editor.value));
 	}
 	updateUrl() {
 		const code = editor.value;
@@ -626,15 +678,16 @@ globalThis.bytebeat = new class {
 		getUrlFromCode(code, this.mode, this.sampleRate);
 	}
 	favoriteErrorBox(error) {
-		ui.yesNoAlert(`${error.message}\n\n${error.stack}\n\nThis may indicate your favorites are corrupted.\nDo you want to erase them?`,()=>{
-			localStorage.favorites="{}";
+		ui.yesNoAlert(`${ error.message }\n\n${ error.stack }\n\n` +
+			'This may indicate your favorites are corrupted.\nDo you want to erase them?', () => {
+			localStorage.favorites = '{}';
 			this.loadFavoriteList();
-		},()=>{})
+		}, () => { });
 	}
 	saveFavorite() {
 		this.updateUrl();
 		try {
-			const favorites = JSON.parse(localStorage.favorites??"[]");
+			const favorites = JSON.parse(localStorage.favorites??'[]');
 			favorites.push({
 				name: ui.favoritesNameInput.value,
 				info: {
@@ -645,174 +698,100 @@ globalThis.bytebeat = new class {
 				url: window.location.hash
 			});
 			localStorage.favorites = JSON.stringify(favorites);
-		} catch(e) { this.favoriteErrorBox(e); } finally {
+		} catch(e) {
+			this.favoriteErrorBox(e);
+		} finally {
 			this.loadFavoriteList();
 		}
 	}
 	loadFavoriteList() {
 		try {
-			const favorites = JSON.parse(localStorage.favorites??"[]");
+			const favorites = JSON.parse(localStorage.favorites??'[]');
 			if(!Array.isArray(favorites)) {
-				let newFavorites = [];
-				for(let i in favorites) {
-					let newFavorite = {};
+				const newFavorites = [];
+				for(const i in favorites) {
+					const newFavorite = {};
 					newFavorite.name = decodeURIComponent(i).split(': ').slice(1).join(': ');
 					newFavorite.info = decodeURIComponent(i).split(': ')[0];
 					newFavorite.url = decodeURIComponent(favorites[i]);
-					newFavorites.push(newFavorite)
+					newFavorites.push(newFavorite);
 				}
 				localStorage.favorites = JSON.stringify(newFavorites);
-				ui.okAlert("Your favorites have been converted!",()=>this.loadFavoriteList());
+				ui.okAlert('Your favorites have been converted!', () => this.loadFavoriteList());
 				return;
 			}
-			while(ui.favoritesList.children.length > 0) ui.favoritesList.removeChild(ui.favoritesList.children[0]); // sacrifice to Armok
+			while(ui.favoritesList.children.length > 0)
+				ui.favoritesList.removeChild(ui.favoritesList.children[0]); // sacrifice to Armok
 			for(let i in favorites) {
 				i=+i; // It saves your sanity.
 				const favorite = favorites[i];
-				const li = document.createElement('li');
-					const li_infoGroup = document.createElement('div');
-						const ig_nameSpan = document.createElement('span');
-							ig_nameSpan.textContent = favorite.name;
-							ig_nameSpan.classList.add("control-label");
-						li_infoGroup.appendChild(ig_nameSpan);
-						const ig_infoSpan = document.createElement('span');
-							if(typeof favorite.info === 'string') {
-								ig_infoSpan.textContent = favorite.info
-							} else {
-								ig_infoSpan.textContent = `${favorite.info.mode}${favorite.info.samplerate}Hz @ ${formatBytes(favorite.info.size)}`
+				const li = FavoriteGenerator.buildFavoriteEntry(i, favorite, favorites.length, () => {
+					ui.yesNoAlert(
+						'Are you sure you want to delete this favorite?',
+						() => {
+							try {
+								const favorites = JSON.parse(localStorage.favorites ?? '[]');
+								favorites.splice(i, 1);
+								localStorage.favorites = JSON.stringify(favorites);
+							} catch(e) {
+								this.favoriteErrorBox(e);
+							} finally {
+								this.loadFavoriteList();
 							}
-							ig_infoSpan.classList.add("control-label");
-						li_infoGroup.appendChild(ig_infoSpan);
-					li.appendChild(li_infoGroup);
-
-
-
-					const li_codeSpan = document.createElement('span');
-						li_codeSpan.classList.add('favorite-text');
-						li_codeSpan.addEventListener('click',()=>{
-							window.location.hash = favorite.url;
-							this.parseUrl();
-							this.resetTime();
-							this.updateUrl();
-							this.playbackToggle(true);
-							this.setSplashtext();
-						})
-						li_codeSpan.innerText = favorite.url.length > 2000 ? favorite.url.slice(0,1997)+'...' : favorite.url;
-					li.appendChild(li_codeSpan);
-
-
-
-					const li_controls = document.createElement('div');
-					li_controls.classList.add("controls");
-						const c_controlGroup0 = document.createElement('div');
-						c_controlGroup0.classList.add("controls-group");
-							const cg0_deleteButton = document.createElement('button');
-							cg0_deleteButton.textContent = "Delete";
-							cg0_deleteButton.classList.add("control-button", "control-text-button");
-							cg0_deleteButton.addEventListener('click',()=>{
-								ui.yesNoAlert("Are you sure you want to delete this favorite?",()=>{
-									try {
-										let favorites = JSON.parse(localStorage.favorites??"[]");
-										favorites.splice(i,1);
-										localStorage.favorites = JSON.stringify(favorites);
-									} catch(e) { this.favoriteErrorBox(e); } finally {
-										this.loadFavoriteList();
-									}
-								},()=>{})
-							})
-							c_controlGroup0.appendChild(cg0_deleteButton);
-
-							const cg0_overwriteButton = document.createElement('button');
-							cg0_overwriteButton.textContent = "Overwrite";
-							cg0_overwriteButton.classList.add("control-button", "control-text-button");
-							cg0_overwriteButton.addEventListener('click',()=>{
-								ui.yesNoAlert("Are you sure you want to overwrite this favorite?",()=>{
-									try {
-										let favorites = JSON.parse(localStorage.favorites??"[]");
-										this.updateUrl();
-										favorites[i] = {
-											name: favorites[i].name,
-											info: {
-												mode: this.mode,
-												samplerate: this.sampleRate,
-												size: new Blob([editor.value]).size
-											},
-											url: window.location.hash
-										};
-										localStorage.favorites = JSON.stringify(favorites);
-									} catch(e) { this.favoriteErrorBox(e); } finally {
-										this.loadFavoriteList();
-									}
-								},()=>{})
-							})
-							c_controlGroup0.appendChild(cg0_overwriteButton);
-
-							const cg0_renameButton = document.createElement('button');
-							cg0_renameButton.textContent = "Rename";
-							cg0_renameButton.classList.add("control-button", "control-text-button");
-							cg0_renameButton.addEventListener('click',()=>{
-								ui.yesNoAlert("Are you sure you want to rename this favorite to what's in the \"New favorite\" bar?",()=>{
-									try {
-										let favorites = JSON.parse(localStorage.favorites??"[]");
-										this.updateUrl();
-										favorites[i].name = ui.favoritesNameInput.value;
-										localStorage.favorites = JSON.stringify(favorites);
-									} catch(e) { this.favoriteErrorBox(e); } finally {
-										this.loadFavoriteList();
-									}
-								},()=>{})
-							})
-							c_controlGroup0.appendChild(cg0_renameButton);
-
-						li_controls.appendChild(c_controlGroup0);
-
-
-						const c_controlGroup1 = document.createElement('div');
-						c_controlGroup1.classList.add("controls-group");
-							const cg1_upButton = document.createElement('button');
-								cg1_upButton.textContent = "Up";
-								cg1_upButton.disabled = i < 1;
-								cg1_upButton.classList.add("control-button", "control-text-button", "favorite-delete");
-								cg1_upButton.addEventListener('click',()=>{
-									try {
-										let favorites = JSON.parse(localStorage.favorites??"[]");
-										const upper = favorites[i-1];
-										const lower = favorites[i];
-										favorites[i-1] = lower;
-										favorites[i] = upper;
-										localStorage.favorites = JSON.stringify(favorites);
-									} catch(e) { this.favoriteErrorBox(e); } finally {
-										this.loadFavoriteList();
-									}
-								})
-							c_controlGroup1.appendChild(cg1_upButton);
-
-							const cg1_downButton = document.createElement('button');
-								cg1_downButton.textContent = "Down";
-								cg1_downButton.disabled = i > (favorites.length - 2);
-								cg1_downButton.classList.add("control-button", "control-text-button", "favorite-delete");
-								cg1_downButton.addEventListener('click',()=>{
-									try {
-										let favorites = JSON.parse(localStorage.favorites??"[]");
-										const upper = favorites[i];
-										const lower = favorites[i+1];
-										favorites[i] = lower;
-										favorites[i+1] = upper;
-										localStorage.favorites = JSON.stringify(favorites);
-									} catch(e) { this.favoriteErrorBox(e); } finally {
-										this.loadFavoriteList();
-									}
-								})
-							c_controlGroup1.appendChild(cg1_downButton);
-						li_controls.appendChild(c_controlGroup1);
-					li.appendChild(li_controls);
-
-
-
+						},
+						() => {}
+					);
+				}, () => {
+					ui.yesNoAlert(
+						'Are you sure you want to overwrite this favorite?',
+						() => {
+							try {
+								const favorites = JSON.parse(localStorage.favorites ?? '[]');
+								this.updateUrl();
+								favorites[i] = {
+									name: favorites[i].name,
+									info: {
+										mode: this.mode,
+										samplerate: this.sampleRate,
+										size: new Blob([editor.value]).size
+									},
+									url: window.location.hash
+								};
+								localStorage.favorites = JSON.stringify(favorites);
+							} catch(e) {
+								this.favoriteErrorBox(e);
+							} finally {
+								this.loadFavoriteList();
+							}
+						},
+						() => {}
+					);
+				}, () => {
+					ui.yesNoAlert(
+						'Are you sure you want to rename this favorite to what\'s in the "New favorite" bar?',
+						() => {
+							try {
+								const favorites = JSON.parse(localStorage.favorites ?? '[]');
+								this.updateUrl();
+								favorites[i].name = ui.favoritesNameInput.value;
+								localStorage.favorites = JSON.stringify(favorites);
+							} catch(e) {
+								this.favoriteErrorBox(e);
+							} finally {
+								this.loadFavoriteList();
+							}
+						},
+						() => {}
+					);
+				});
 				ui.favoritesList.appendChild(li);
 				ui.favoritesList.appendChild(document.createElement('hr'));
 			}
-			if(ui.favoritesList.children.length > 0) ui.favoritesList.removeChild(ui.favoritesList.children[ui.favoritesList.children.length-1]); // Remove that last hr
-		} catch(e) { this.favoriteErrorBox(e); }
+			// Remove the last <hr> element
+			if(ui.favoritesList.children.length > 0)
+				ui.favoritesList.removeChild(ui.favoritesList.children[ui.favoritesList.children.length-1]);
+		} catch(e) {
+			this.favoriteErrorBox(e);
+		}
 	}
 }();

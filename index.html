@@ -205,7 +205,7 @@
 							<input type="text" value="Name" id="favorites-nameinput" class="control-text"/>
 						</div>
 					</div>
-					<p>All favorites are basically URLs stored as supercookies. These, some Google Analytics cookies added by GitHub Pages, and the settings supercookie are the only things persistently stored on your device.</p>
+					<p>All favorites are basically URLs stored as supercookies. These, some Google Analytics cookies added by GitHub Pages, and the settings supercookie are the only things persistently stored on your device to my knowledge.</p>
 					<ul id="favorites-content"></ul>
 				</article>
 			</details>
@@ -321,9 +321,15 @@
 							<button id="settings-audiorate-apply" class="control-button control-text-button">Apply</button>
 						</div>
 					</label>
-					<p>The song's samplerate is upscaled/downscaled (block resampling!) to this samplerate. 48000 or above is recommended, likely some multiple of 48000.<br>
-					Be warned: The higher you put this, the more powerful your computer is expected to be!<br>
-				    You need to stay in the range [8000, 192000]. <b>Keep in mind that 48000 covers all frequencies you will be able to hear,</b> you only need to turn it up if you want to go ultrasonic.</p>
+					<p>
+						14112000Hz would be ideal (the least common multiple of 32kHz, 44.1kHz, and 48kHz) but it's a shame it's so big.<br />
+						<br />
+						The song is block resampled from it's own samplerate to this samplerate. 48000 well covers your hearing.<br />
+						Changing this value from 48000 is likely to slow down or speed up some songs / some of their parts.<br />
+						If you want to go ultrasonic, I guess you can turn this up, but at that point you need specialized hardware.<br />
+						Turning this up can also provide better samplng (it made a piano sound more accurate, for instance),
+						and it can quiet down some unintended frequencies when this samplerate isn't a multiple of the song samplerate.
+					</p>
 					<label class="settings-block">
 						<a href="bytebeat.php?manage" title="You will be disappointed if you're clicking this link on prod. It won't work.">Manage library (only works in devEnv)</a>
 					</label>
