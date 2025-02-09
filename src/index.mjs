@@ -7,6 +7,7 @@ import { Actions } from './actions.mjs';
 import { splashes } from './splashes.mjs';
 
 import { FavoriteGenerator } from './generator.mjs';
+import { Prec } from '@codemirror/state';
 
 const editor = new Editor();
 const library = new Library();
@@ -111,6 +112,7 @@ globalThis.bytebeat = new class {
 				this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
 			case 'actions-activate-mic': this.activateMic(); break;
 			case 'actions-deactivate-mic': this.deactivateMic(); break;
+			case 'actions-mic-test': this.micTest(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -291,13 +293,13 @@ globalThis.bytebeat = new class {
 				},
 				video: false
 			});
+			console.log(this.micMedia.getAudioTracks()[0].getSettings());
 			this.mediaInputSourceNode = this.audioCtx.createMediaStreamSource(this.micMedia);
 			this.mediaInputSourceNode.connect(this.audioWorkletNode);
 		} catch(e) {
 			ui.yesNoAlert('Failed to activate mic. See error?', () => {
-				ui.okAlert(e + '\n\nTry setting your player samplerate to '
-					+ (this.micMedia.getAudioTracks()[0]?.getCapabilities()?.sampleRate ?? 48000)
-					+ ' in settings.');
+				ui.okAlert(e + '\n\nRun the mic test to get the right samplerate.' +
+					'\nI\'d fix this internally if i had the chance. I\'m sorry.');
 			}, () => { });
 		}
 	}
@@ -306,6 +308,27 @@ globalThis.bytebeat = new class {
 		this.mediaInputSourceNode.disconnect();
 		this.mediaInputSourceNode = null;
 		this.micMedia = null;
+	}
+	async micTest() {
+		const testContext = new AudioContext({
+			numberOfChannels: 1,
+			length: 1
+		});
+		try {
+			this.micMedia = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+			const tempSource = testContext.createMediaStreamSource(this.micMedia);
+			const detectedSampleRate = tempSource.context.sampleRate; // Extract detected sample rate
+			if(typeof detectedSampleRate == 'number') {
+				ui.okAlert('The samplerate is ' + detectedSampleRate + 'Hz.');
+			} else {
+				ui.okAlert('I couldn\'t figure out the samplerate.');
+			}
+		} catch(e) {
+			ui.okAlert('I got an error trying to figure out the samplerate.');
+			console.error(e);
+		} finally {
+			testContext.close();
+		}
 	}
 	setSplashtext() {
 		if(!window.location.hostname.includes(this.expectedDomain) &&

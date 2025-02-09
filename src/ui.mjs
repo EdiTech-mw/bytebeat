@@ -74,7 +74,6 @@ export class UI {
 		this.actionAutoformat = document.getElementById('actions-format');
 		this.actionMinibake = document.getElementById('actions-minibake');
 		this.actionDeminibake = document.getElementById('actions-deminibake');
-		this.actionActivateMic = document.getElementById('actions-activate-mic');
 		this.okDialog = document.getElementById('ok-dialog');
 		this.okDialogText = document.getElementById('ok-dialog-text');
 		this.okDialogButton = document.getElementById('ok-dialog-ok');
