@@ -17,10 +17,12 @@ const actions = new Actions();
 globalThis.bytebeat = new class {
 	constructor() {
 		this.audioCtx = null;
+		this.micMedia = null;
 		this.audioGain = null;
 		this.audioRecordChunks = [];
 		this.audioRecorder = null;
 		this.audioWorkletNode = null;
+		this.mediaInputSourceNode = null;
 		this.byteSample = 0;
 		this.defaultSettings = {
 			codeStyle: 'Atom Dark',
@@ -107,6 +109,8 @@ globalThis.bytebeat = new class {
 			case 'favorites-reload': this.loadFavoriteList(); break;
 			case 'settings-audiorate-apply':
 				this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
+			case 'actions-activate-mic': this.activateMic(); break;
+			case 'actions-deactivate-mic': this.deactivateMic(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },
@@ -274,6 +278,34 @@ globalThis.bytebeat = new class {
 			setTimeout(() => window.URL.revokeObjectURL(url));
 		});
 		this.audioGain.connect(mediaDest);
+	}
+	async activateMic() {
+		if(this.mediaInputSourceNode !== null) return;
+		try {
+			this.micMedia ??= await navigator.mediaDevices.getUserMedia({
+				audio: {
+					echoCancellation: false,
+					noiseSuppression: false,
+					autoGainControl: false,
+					sampleRate: this.settings.audioSampleRate
+				},
+				video: false
+			});
+			this.mediaInputSourceNode = this.audioCtx.createMediaStreamSource(this.micMedia);
+			this.mediaInputSourceNode.connect(this.audioWorkletNode);
+		} catch(e) {
+			ui.yesNoAlert('Failed to activate mic. See error?', () => {
+				ui.okAlert(e + '\n\nTry setting your player samplerate to '
+					+ (this.micMedia.getAudioTracks()[0]?.getCapabilities()?.sampleRate ?? 48000)
+					+ ' in settings.');
+			}, () => { });
+		}
+	}
+	deactivateMic() {
+		if(this.mediaInputSourceNode == null) return;
+		this.mediaInputSourceNode.disconnect();
+		this.mediaInputSourceNode = null;
+		this.micMedia = null;
 	}
 	setSplashtext() {
 		if(!window.location.hostname.includes(this.expectedDomain) &&

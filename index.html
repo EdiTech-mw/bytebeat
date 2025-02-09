@@ -328,7 +328,8 @@
 						Changing this value from 48000 is likely to slow down or speed up some songs / some of their parts.<br />
 						If you want to go ultrasonic, I guess you can turn this up, but at that point you need specialized hardware.<br />
 						Turning this up can also provide better samplng (it made a piano sound more accurate, for instance),
-						and it can quiet down some unintended frequencies when this samplerate isn't a multiple of the song samplerate.
+						and it can quiet down some unintended frequencies when this samplerate isn't a multiple of the song samplerate.<br />
+						Changing this right now can cause samplerate issues that stop you from using the mic :(
 					</p>
 					<label class="settings-block">
 						<a href="bytebeat.php?manage" title="You will be disappointed if you're clicking this link on prod. It won't work.">Manage library (only works in devEnv)</a>
@@ -348,6 +349,12 @@
 					</button>
 					<button id="actions-deminibake" class="control-button control-text-button">
 						Deminibake
+					</button>
+					<button id="actions-activate-mic" class="control-button control-text-button">
+						Activate Mic
+					</button>
+					<button id="actions-deactivate-mic" class="control-button control-text-button">
+						Deactivate Mic
 					</button>
 				</article>
 			</details>
