@@ -9,7 +9,7 @@ export const splashes = [
     "Wait, Why is there a math constant named SQRT1_2? Just run Math.sqrt(1/2)?",
     "Imagine if this website completely broke 💀",
     `DIE! <i>throws die...</i> a ${Math.floor(Math.random() * 6)+1}!`,
-    "Fun fact: The 16 bit integer limit will overflow and corrupt the javascript. Never enter 65535 as it will crash the page.",
+    "Fun fact: The 16 bit integer limit will overflow and corrupt the javascript.<br>Never enter 65535 as it will crash the page.",
     "Go away, exotic modes and functions! GO AWAY!",
     "I don't think the whale would <i>swear</i> over air conditioning...",
     "The initramfs will completely freak out the linting.",
@@ -61,6 +61,8 @@ export const splashes = [
     "Cookie?",
     "Change is OK!",
     "Expand your mind, OMORI!",
-    "spooky scary skeletions<br>send shivers down your spine<br><br>these shricking skulls will shock your soul<br>seal your fate tonight",
-    "Check out the <a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blank'>user manual!</a>"
+    "Expand!",
+    "spooky scary skeletions<br>send shivers down your spine<br><br>shrieking skulls will shock your soul<br>seal your fate tonight",
+    "Check out the <a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blank'>user manual!</a>",
+    "Error 40!<br>The page has detected a critical error and will now combust!"
 ];

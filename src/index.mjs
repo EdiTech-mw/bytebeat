@@ -113,6 +113,7 @@ globalThis.bytebeat = new class {
 			case 'actions-activate-mic': this.activateMic(); break;
 			case 'actions-deactivate-mic': this.deactivateMic(); break;
 			case 'actions-mic-test': this.micTest(); break;
+			case 'splash': this.setSplashtext(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
 					this.loadCode(Object.assign({ code: elem.innerText },

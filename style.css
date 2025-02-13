@@ -34,7 +34,7 @@
 	--control-volume-hover: linear-gradient(to bottom, #90a7d7, #3f4c71);
 	--editor: #191c22;
 	--entry: #191c22;
-	--entry-border: linear-gradient(to right, #439157, #16202b);
+	--library-seperator: linear-gradient(to right, #439157, #16202b);
 	--focus: #614fdb;
 	--font-size: 10.5pt;
 	--library-header: linear-gradient(to bottom, #204620, #0b170c);
@@ -44,6 +44,8 @@
 	--link-hover: #3fe2e2 !important;
 	--dialog-background: linear-gradient(to bottom,#000,#050);
 	--dialog-border: #5dfd57;
+	--warning-color: #ffe600;
+	--splash-color: #00aeff;
 }
 
 html[data-theme="Dollchan"] {
@@ -69,6 +71,43 @@ html[data-theme="Dollchan"] {
 	--library-header-hover: linear-gradient(to bottom, #32426c, #151b2b);
 	--dialog-background: linear-gradient(to bottom,#313031,#505760);
 	--dialog-border: #aeaeae;
+}
+
+/*      BRIGHT  MEDIUM   DARK
+PRIMRY #18cc00 #0f8000 #063300 (#1EFF00)
+SECOND #3d9933 #266020 #0f260d
+ACCENT #00cca3 #008066 #003329 (#00CDFF) */
+html[data-theme="Modern"] {
+	--canvas-border: linear-gradient(to bottom, #00cca3, #008066) 1;
+	--canvas-button: linear-gradient(to bottom, #0f8000, #063300);
+	--canvas-button-hover: linear-gradient(to bottom, #18cc00, #0f8000) !important;
+	--code-author: #0f8000;
+	--code-button: linear-gradient(to bottom, #266020, #0f260d);
+	--code-button-border: #008066;
+	--code-button-hover: linear-gradient(to bottom, #3d9933, #266020);
+	--code-tags: #3d9933;
+	--control-button: linear-gradient(to bottom, #0f8000, #063300);
+	--control-button-active: linear-gradient(to bottom, #00cca3, #008066);
+	--control-button-border: #437e7b;
+	--control-button-hover: linear-gradient(to bottom, #18cc00, #0f8000);
+	--button-hover-color: #000;
+	--control-text: linear-gradient(to top, #266020, #0f260d);
+	--control-text-hover: linear-gradient(to top, #008066, #003329);
+	--control-volume: linear-gradient(to bottom, #266020, #0f260d);
+	--control-volume-hover: linear-gradient(to bottom, #3d9933, #266020);
+	--editor: #062800;
+	--entry: #0f260d;
+	--library-seperator: linear-gradient(to right, #0f8000, #063300);
+	--focus: #00ffcc;
+	--link: #00cca3;
+	--link-hover: #00ffcc !important;
+	--library-header: linear-gradient(to bottom, #0f8000, #063300);
+	--library-header-hover: linear-gradient(to bottom, #18cc00, #0f8000);
+	--library-header-hover-color: #000;
+	--dialog-background: linear-gradient(to bottom,#0f8000, #063300);
+	--dialog-border: #18cc00;
+	--warning-color: #ffc400;
+	--splash-color: #00ffcc;
 }
 
 html[data-theme="Blue"] {
@@ -116,7 +155,7 @@ html[data-theme="Cake"] {
 	--control-volume-hover: linear-gradient(to bottom, #f369d5, #1c8fa3);
 	--editor: #1e071c;
 	--entry: #331831;
-	--entry-border: linear-gradient(to right, #94449b, #24162b);
+	--library-seperator: linear-gradient(to right, #94449b, #24162b);
 	--focus: #56e6ff;
 	--library-header: linear-gradient(to bottom, #c0359d, #00353a);
 	--library-header-hover: linear-gradient(to bottom, #ee58c9, #004950);
@@ -146,7 +185,7 @@ html[data-theme="Dusk"] {
 	--control-volume-hover: linear-gradient(to bottom, #606090, #303048);
 	--editor: #101018;
 	--entry: #1d1d2b;
-	--entry-border: linear-gradient(to right, #606095, #141426);
+	--library-seperator: linear-gradient(to right, #606095, #141426);
 	--focus: #8080c0;
 	--library-header: linear-gradient(to bottom, #202030, #404060);
 	--library-header-hover: linear-gradient(to bottom, #303048, #606096);
@@ -176,7 +215,7 @@ html[data-theme="Green"] {
 	--control-volume-hover: linear-gradient(to bottom, #68b46d, #3f714c);
 	--editor: #0f1712;
 	--entry: #19221a;
-	--entry-border: linear-gradient(to right, #388036, #112211);
+	--library-seperator: linear-gradient(to right, #388036, #112211);
 	--focus: #aaffc4;
 	--library-header: linear-gradient(to bottom, #20462c, #0b170d);
 	--library-header-hover: linear-gradient(to bottom, #326c42, #152b1b);
@@ -202,7 +241,7 @@ html[data-theme="Orange"] {
 	--control-volume-hover: linear-gradient(to bottom, #ffaf6a, #4e2e10);
 	--editor: #171006;
 	--entry: #221e19;
-	--entry-border: linear-gradient(to right, #dc781e, #2b2016);
+	--library-seperator: linear-gradient(to right, #dc781e, #2b2016);
 	--focus: #fff2aa;
 	--library-header: linear-gradient(to bottom, #c56600, #1d1206);
 	--library-header-hover: linear-gradient(to bottom, #f58004, #3b260d);
@@ -229,7 +268,7 @@ html[data-theme="Purple"] {
 	--control-volume-hover: linear-gradient(to bottom, #ab68b4, #693f71);
 	--editor: #1a121c;
 	--entry: #1e1922;
-	--entry-border: linear-gradient(to right, #684386, #281a33);
+	--library-seperator: linear-gradient(to right, #684386, #281a33);
 	--focus: #8289ff;
 	--library-header: linear-gradient(to bottom, #432046, #170b16);
 	--library-header-hover: linear-gradient(to bottom, #65326c, #2b152a);
@@ -258,7 +297,7 @@ html[data-theme="Teal"] {
 	--control-volume-hover: linear-gradient(to bottom, #4dd7e0, #1f494d);
 	--editor: #061717;
 	--entry: #1f2b2b;
-	--entry-border: linear-gradient(to right, #2a7e80, #162b2b);
+	--library-seperator: linear-gradient(to right, #2a7e80, #162b2b);
 	--focus: #aafcff;
 	--library-header: linear-gradient(to bottom, #2b8082, #0e2828);
 	--library-header-hover: linear-gradient(to bottom, #3c9fa2, #214a4a);
@@ -296,7 +335,7 @@ html[data-theme="Teal"] {
 /* ==[ Common ] =========================================================================================== */
 
 #dollchan-warning {
-	color: #ffe600;
+	color: var(--warning-color);
 	font-size: 12px;
 	width: fit-content;
 	margin-inline: auto;
@@ -304,7 +343,7 @@ html[data-theme="Teal"] {
 }
 
 #splash {
-	color: #00aeff;
+	color: var(--splash-color);
 	font-size: 16px;
 	width: fit-content;
 	margin-inline: auto;
@@ -803,7 +842,7 @@ button[name="close"] {
 
 .songs-block {
 	padding: 0 4px 4px 0;
-	border-image: var(--entry-border) 10%;
+	border-image: var(--library-seperator) 10%;
 	border-top: 2px solid;
 	background: none;
 }
