@@ -2,5 +2,6 @@
 /build
 /artifactRoot
 /data/library/merger/
+deno.lock
 node_modules
 settings.php
