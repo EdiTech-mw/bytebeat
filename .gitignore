@@ -1,5 +1,6 @@
 .htaccess
 /build
 /artifactRoot
+/data/library/merger/
 node_modules
 settings.php
