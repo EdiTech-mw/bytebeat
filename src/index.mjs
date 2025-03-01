@@ -110,9 +110,10 @@ globalThis.bytebeat = new class {
 			case 'favorites-reload': this.loadFavoriteList(); break;
 			case 'settings-audiorate-apply':
 				this.setAudioSampleRate(ui.settingsAudioRate.value ?? 48000); break;
-			case 'actions-activate-mic': this.activateMic(); break;
-			case 'actions-deactivate-mic': this.deactivateMic(); break;
-			case 'actions-mic-test': this.micTest(); break;
+			// case 'actions-activate-mic': this.activateMic(); break;
+			case 'control-mic': this.toggleMic(); break;
+			// case 'actions-deactivate-mic': this.deactivateMic(); break;
+			// case 'actions-mic-test': this.micTest(); break;
 			case 'splash': this.setSplashtext(); break;
 			default:
 				if(elem.classList.contains('code-text')) {
@@ -282,34 +283,6 @@ globalThis.bytebeat = new class {
 		});
 		this.audioGain.connect(mediaDest);
 	}
-	async activateMic() {
-		if(this.mediaInputSourceNode !== null) return;
-		try {
-			this.micMedia ??= await navigator.mediaDevices.getUserMedia({
-				audio: {
-					echoCancellation: false,
-					noiseSuppression: false,
-					autoGainControl: false,
-					sampleRate: this.settings.audioSampleRate
-				},
-				video: false
-			});
-			console.log(this.micMedia.getAudioTracks()[0].getSettings());
-			this.mediaInputSourceNode = this.audioCtx.createMediaStreamSource(this.micMedia);
-			this.mediaInputSourceNode.connect(this.audioWorkletNode);
-		} catch(e) {
-			ui.yesNoAlert('Failed to activate mic. See error?', () => {
-				ui.okAlert(e + '\n\nRun the mic test to get the right samplerate.' +
-					'\nI\'d fix this internally if i had the chance. I\'m sorry.');
-			}, () => { });
-		}
-	}
-	deactivateMic() {
-		if(this.mediaInputSourceNode == null) return;
-		this.mediaInputSourceNode.disconnect();
-		this.mediaInputSourceNode = null;
-		this.micMedia = null;
-	}
 	async micTest() {
 		const testContext = new AudioContext({
 			numberOfChannels: 1,
@@ -320,7 +293,8 @@ globalThis.bytebeat = new class {
 			const tempSource = testContext.createMediaStreamSource(this.micMedia);
 			const detectedSampleRate = tempSource.context.sampleRate; // Extract detected sample rate
 			if(typeof detectedSampleRate == 'number') {
-				ui.okAlert('The samplerate is ' + detectedSampleRate + 'Hz.');
+				ui.yesNoAlert('The samplerate is ' + detectedSampleRate + 'Hz.' +
+					'\n\nApply this samplerate now?', ()=>{ this.setAudioSampleRate(detectedSampleRate) }, () => { });
 			} else {
 				ui.okAlert('I couldn\'t figure out the samplerate.');
 			}
@@ -331,10 +305,39 @@ globalThis.bytebeat = new class {
 			testContext.close();
 		}
 	}
+	async toggleMic() {
+		if(this.mediaInputSourceNode == null) {
+			try {
+				this.micMedia ??= await navigator.mediaDevices.getUserMedia({
+					audio: {
+						echoCancellation: false,
+						noiseSuppression: false,
+						autoGainControl: false,
+						sampleRate: this.settings.audioSampleRate
+					},
+					video: false
+				});
+				this.mediaInputSourceNode = this.audioCtx.createMediaStreamSource(this.micMedia);
+				this.mediaInputSourceNode.connect(this.audioWorkletNode);
+				ui.controlMic.innerHTML = "Mic Down";
+				ui.controlMic.title = "Mic is activated. Click to deactivate."
+			} catch(e) {
+				ui.yesNoAlert('Failed to activate mic. See error?', () => {
+					ui.yesNoAlert(e + '\n\nWant the correct samplerate to use?', () => { this.micTest() }, () => { });
+				}, () => { });
+			}
+		} else {
+			this.mediaInputSourceNode.disconnect();
+			this.mediaInputSourceNode = null;
+			this.micMedia = null;
+			ui.controlMic.innerHTML = "Mic Up";
+			ui.controlMic.title = "Mic is deactivated. Click to activate."
+		}
+	}
 	setSplashtext() {
 		if(!window.location.hostname.includes(this.expectedDomain) &&
 		!window.location.hostname.startsWith('127.') &&
-		!window.location.hostname.startsWith('::1') &&
+		!window.location.hostname.startsWith('[::1]') &&
 		!window.location.hostname.includes('local'))
 			ui.splashElem.innerHTML = 'Featuring the Disturbance in the Force!';
 		else ui.splashElem.innerHTML = splashes[Math.random()*splashes.length|0];
@@ -676,7 +679,8 @@ globalThis.bytebeat = new class {
 			volumeValue = ui.controlVolume.value / ui.controlVolume.max;
 		}
 		ui.controlVolume.value = this.settings.volume = volumeValue;
-		ui.controlVolume.title = `Volume: ${ (volumeValue * 100).toFixed(2) }%`;
+		ui.controlVolume.title = `Volume: ${ (volumeValue * 100).toFixed(0) }%`;
+		ui.controlVolumeDisplay.textContent = `${ (volumeValue * 100).toFixed(0) }%`;
 		this.saveSettings();
 		this.audioGain.gain.value = volumeValue * volumeValue;
 	}
@@ -702,7 +706,7 @@ globalThis.bytebeat = new class {
 	}
 	formatCode() {
 		const code1 = editor.value;
-		const data = actions.commaFormat(code1);
+		const data = actions.commaFormat(code1, ui.controlMaxParens.value);
 		if(data.error) {
 			ui.okAlert(`Format failed: ${ data.error }!`);
 			return;

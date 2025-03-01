@@ -36,43 +36,10 @@
 				<p id="ok-dialog-text">Alert!</p>
 				<div><button id="ok-dialog-ok" class="control-button control-text-button">OK</button></div>
 			</dialog>
-
 			<div class="controls" id="controls0">
 				<div class="controls-group controls-grow">
 					<button id="control-counter-units" class="control-button" title="Time units">t</button>
 					<input type="text" id="control-counter" class="control-text" value="0" title="Set time to jump along the timeline then press Enter">
-				</div>
-				<div class="controls-group">
-					<button id="control-stop" class="control-button" title="Stop and reset">
-						<svg><use xlink:href="#symbol-stop"></use></svg>
-					</button>
-					<button id="control-reset" class="control-button" title="Reset time to 0">
-						<svg><use xlink:href="#symbol-reset"></use></svg>
-					</button>
-				</div>
-				<div class="controls-group">
-					<button id="control-play-backward" class="control-button control-play" title="Play reverse">
-						<span class="control-fast-multiplier">1</span>
-						<svg class="svg-fast"><use xlink:href="#symbol-fast"></use></svg>
-						<svg class="svg-play"><use xlink:href="#symbol-play"></use></svg>
-					</button>
-					<button id="control-pause" class="control-button" title="Pause">
-						<svg><use xlink:href="#symbol-pause"></use></svg>
-					</button>
-					<button id="control-play-forward" class="control-button control-play" title="Play forward">
-						<span class="control-fast-multiplier">1</span>
-						<svg class="svg-fast"><use xlink:href="#symbol-fast"></use></svg>
-						<svg class="svg-play"><use xlink:href="#symbol-play"></use></svg>
-					</button>
-				</div>
-				<div class="controls-group">
-					<button id="control-scaledown" class="control-button" title="Zoom in the scope">
-						<svg><use xlink:href="#symbol-scaledown"></use></svg>
-					</button>
-					<div id="control-scale" class="control-button" title="Scope zoom factor. Click to reset."></div>
-					<button id="control-scaleup" class="control-button" title="Zoom out the scope">
-						<svg><use xlink:href="#symbol-scaleup"></use></svg>
-					</button>
 				</div>
 				<select id="control-drawmode" class="control-select controls-grow" title="Drawing mode">
 					<option value="Points" selected>Points</option>
@@ -115,33 +82,54 @@
 					</button>
 					<span id="control-codesize" class="control-text" title="Code size in bytes (link size in characters)"></span>
 				</div>
-				<div class="controls-group controls-grow">
-					<input id="control-volume" type="range" min="0" max="1" value=".5" step="any" title="Volume">
-				</div>
-				<!--select id="control-menu-select" class="control-select" title="Control menus" onchange="MAT.changeMenu(this.value)">
-					<option class="song-options"  value="1" title="MODE, SAMPLERATE, DIVISOR" selected>MENU 1 - SONG OPTIONS</option>
-					<option class="song-options"  value="2">MENU 2 - TRANSFORMATIONS</option>
-					<option class="song-options"  value="3">MENU 3 - DETAILS</option>
-					<!-option value="2" title="MENU 2- TEST">MENU 2 - TEST</option->
-				</select-->
 			</div>
-			<!--<div class="controls hidden" id="controls2">
+			<div class="controls" id="controls1">
 				<div class="controls-group">
-					<input onchange="MAT.setParens(this.value)" type="number" id="control-parens" title="Maximum parentesies layers the Formatter will formatt" value="0">
+					<button id="actions-format" class="control-button control-text-button">
+						Comma&ndash;seperate
+					</button>
+					<input type="number" id="control-maxparens" class="control-text" value="0" title="Set maximum parentesies layers to format">
 				</div>
-				<button id="control-format" class="control-button text-padding" title="Formats code based off of commas and semicolons" onclick="MAT.commaFormat(false)">
-					FORMAT , and ;
+				<div class="controls-group">
+					<button id="control-scaledown" class="control-button" title="Zoom in the scope">
+						<svg><use xlink:href="#symbol-scaledown"></use></svg>
+					</button>
+					<div id="control-scale" class="control-button" title="Scope zoom factor. Click to reset."></div>
+					<button id="control-scaleup" class="control-button" title="Zoom out the scope">
+						<svg><use xlink:href="#symbol-scaleup"></use></svg>
+					</button>
+				</div>
+				<div class="controls-group">
+					<button id="control-stop" class="control-button" title="Stop and reset">
+						<svg><use xlink:href="#symbol-stop"></use></svg>
+					</button>
+					<button id="control-reset" class="control-button" title="Reset time to 0">
+						<svg><use xlink:href="#symbol-reset"></use></svg>
+					</button>
+				</div>
+				<div class="controls-group">
+					<button id="control-play-backward" class="control-button control-play" title="Play reverse">
+						<span class="control-fast-multiplier">1</span>
+						<svg class="svg-fast"><use xlink:href="#symbol-fast"></use></svg>
+						<svg class="svg-play"><use xlink:href="#symbol-play"></use></svg>
+					</button>
+					<button id="control-pause" class="control-button" title="Pause">
+						<svg><use xlink:href="#symbol-pause"></use></svg>
+					</button>
+					<button id="control-play-forward" class="control-button control-play" title="Play forward">
+						<span class="control-fast-multiplier">1</span>
+						<svg class="svg-fast"><use xlink:href="#symbol-fast"></use></svg>
+						<svg class="svg-play"><use xlink:href="#symbol-play"></use></svg>
+					</button>
+				</div>
+				<button id="control-mic" class="control-button control-text-button" title="Mic is deactivated. Click to activate.">
+					Mic Up
 				</button>
-				<button id="control-minibake" class="control-button text-padding dark" title="Minibakes code" onclick="MAT.bake()">
-					Minibake code
-				</button>
-				<button id="control-deminibake" class="control-button text-padding light" title="Deminibakes code" onclick="MAT.debake()">
-					Deminibake code
-				</button>
+				<div class="controls-group controls-grow">
+					<input id="control-volume" type="range" min="0" max="1" value=".5" step="0.05" title="Volume">
+				</div>
+				<span class="control-label" id="control-volume-display">...%</span>
 			</div>
-			<div class="controls hidden" id="controls3">
-				<!- <input type="checkbox" onchange="MAT.switch(this.checked)">Toggle extra library buttons ->
-			</div-->
 			<div id="error"></div>
 			<div id="canvas-container" title="Click to play">
 				<canvas id="canvas-main" width="1024" height="256"></canvas>
@@ -342,51 +330,14 @@
 					<h1>Song actions</h1>
 				</summary>
 				<article id="settings" class="library-container entry loaded">
-					<button id="actions-format" class="control-button control-text-button">
-						Autoformat
-					</button>
 					<button id="actions-minibake" class="control-button control-text-button">
 						Minibake
 					</button>
 					<button id="actions-deminibake" class="control-button control-text-button">
 						Deminibake
 					</button>
-					<button id="actions-activate-mic" class="control-button control-text-button">
-						Activate Mic
-					</button>
-					<button id="actions-deactivate-mic" class="control-button control-text-button">
-						Deactivate Mic
-					</button>
-					<button id="actions-mic-test" class="control-button control-text-button">
-						(mic test)
-					</button>
 				</article>
 			</details>
-			<!-- <details class="library-content">
-				<summary class="library-header">
-					<h1>Chasyxx &mdash; code Chasyxx created<h1>
-					<svg class="loading-wait hidden"><use xlink:href="#symbol-wait"/></svg>
-				</summary>
-				<div id="library-chasyxx" class="library-container"></div>
-			</details> -->
-			<!-- <details class="library-content hidden optionalEntry">
-				<summary class="library-header">
-					<h1>Pouet &mdash; Pouet threads</h1>
-				</summary>
-				<article id="info" class="library-container entry-top">
-					<p>This is the main bytebeat thread. Wurstcaptures links are broken, so copy them and put them in the tools to get your codes.</p>
-					<iframe src="https://www.pouet.net/topic.php?which=8357" style="width: 100%" height="256"></iframe>
-					<a href="https://www.pouet.net/topic.php?which=8357">Page link</a>
-				</article>
-			</details>
-			<details class="library-content hidden optionalEntry">
-				<summary class="library-header">
-					<h1>Tools &mdash; Tools that are better off left out of the options menus</h1>
-				</summary>
-				<article id="info" class="library-container entry-top">
-					<iframe src="https://chasyxx.github.io/ChyxTools/" style="width: 100%" height="256"></iframe>
-				</article>
-			</details> -->
 			<footer>
 				<a class="link" href="https://dollchan.net/btb/" title="Dollchan bytebeat discussion threads" target="_blank">Discussion board</a><br>
 				<a class="link" href="https://github.com/Chasyxx/EnBeat_NEW" title="This site's Github repo" target="_blank">This site's source code</a><br>

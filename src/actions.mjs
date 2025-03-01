@@ -10,7 +10,6 @@ export class Actions { //Chasyxx's bakers chasyxx.github.io/minibaker
 		this.sts = null
 		this.errorReason = null
 		this.errorChar = null
-		this.considerParens = true
 		this.formatted = null
 		this.code = document.getElementById('editor-default')
 		this.forceElem = document.getElementById('control-force-output')
@@ -23,7 +22,6 @@ export class Actions { //Chasyxx's bakers chasyxx.github.io/minibaker
 		this.AprilFoolsElements = [this.bakeElem, this.debakeElem]
 		this.errorText = null
 		this.oldCode = null
-		this.MaxParenLayersAllowed = 0
 		this.localTest = null
 	}
 	minibakeCode(str) {
@@ -51,59 +49,57 @@ export class Actions { //Chasyxx's bakers chasyxx.github.io/minibaker
 
 		return str
 	}
-	commaFormat(initialCode) {
-		let output = initialCode;
-		let parenLayerCount = 0
+	commaFormat(initialCode, maxParenLayers = 0) {
+		let output = '';
+		let parenLayerCount = 0;
 		let inString = false
-		let arrayLayerCount = false
-		for (let i = 0; i < output.length; i++) {
-			switch (output[i]) {
-				case `,`: case ``:
-					console.log(this.MaxParenLayersAllowed + " , " + parenLayerCount + ": " + (parenLayerCount < (this.MaxParenLayersAllowed + 1)))
-					if ((parenLayerCount < (this.MaxParenLayersAllowed + 1) || !this.considerParens) && (arrayLayerCount == 0) && !inString && output[i + 1] != `\n`) {
-						output = output.slice(0, i) + `${output[i]}\n` + output.slice(i + 1, output.length)
+		let arrayLayerCount = 0;
+		for(let i = 0; i < initialCode.length; i++) {
+			const c = initialCode[i];
+			switch(c) {
+				case ',': case ';': {
+					output += c;
+					if ((parenLayerCount <= maxParenLayers) && (arrayLayerCount < 1) && !inString && initialCode[i + 1] != `\n`) {
+						output += "\n\n"+"\t".repeat(parenLayerCount);
 					}
-					break
-
-				case `\``: case `'`: case `"`:
-					if (inString && output[i - 1] != '\\') {
-						if (inString == output[i]) {
+				} break;
+				case '`': case '\'': case '"': {
+					if (inString && initialCode[i - 1] != '\\') {
+						if (inString == initialCode[i]) {
 							inString = false
 						}
 					} else (
-						inString = output[i]
+						inString = initialCode[i]
 					)
-					break
-
-				case `[`:
-					if (!inString) {
-						arrayLayerCount++
-					}
-					break
-
-				case `]`:
-					if (!inString) {
-						arrayLayerCount--
+					output += c;
+				} break;
+				case '[': {
+					if(!inString) arrayLayerCount++;
+					output += c;
+				} break;
+				case ']': {
+					if(!inString) {
+						arrayLayerCount--;
 						if (arrayLayerCount < 0) {
 							return { error: "Unbalanced array", code: null };
 						}
 					}
-					break
-
-				case `(`:
-					if (!inString) {
-						parenLayerCount++
-					}
-					break
-
-				case `)`:
-					if (!inString) {
-						parenLayerCount--
+					output += c;
+				} break;
+				case '(': {
+					if(!inString) parenLayerCount++;
+					output += c;
+				} break;
+				case ')': {
+					if(!inString) {
+						parenLayerCount--;
 						if (parenLayerCount < 0) {
 							return { error: "Unbalanced parenthesies", code: null };
 						}
 					}
-					break
+					output += c;
+				} break;
+				default: output += c; break;
 			}
 		}
 		if (arrayLayerCount > 0) {
