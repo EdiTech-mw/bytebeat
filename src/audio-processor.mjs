@@ -77,10 +77,13 @@ class audioProcessor extends AudioWorkletProcessor {
 				let funcValue;
 				const currentSample = Math.floor(byteSample);
 				try {
-					let micSample = [0, 0, 0];
-					if(inputs.length > 0 && inputs[0].length > 0)
-						micSample = [inputs[0][0][i], inputs[0][1][i],
-							inputs[0][0][i] / 2 + inputs[0][1][i] / 2];
+					// long cascade of null handlers
+					const inputs0 = inputs[0] ?? [ ];
+					const inputs00 = inputs0[0] ?? [ ];
+					const inputs01 = inputs0[1] ?? inputs00;
+					const inputs00i = inputs00[i] ?? 0;
+					const inputs01i = inputs01[i] ?? 0;
+					const micSample = [inputs00i, inputs01i, inputs00i / 2 + inputs01i / 2];
 					if(this.isFuncbeat) {
 						funcValue = this.func(currentSample / this.sampleRate, this.sampleRate,
 							currentSample, micSample);

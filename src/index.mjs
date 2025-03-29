@@ -188,7 +188,7 @@ globalThis.bytebeat = new class {
 			window.alert(
 				$ +
 				'\n\n(This is an emergency error handler as the regular error handler failed. ' +
-				'It means either it, or the code editor & UI setup faled. '+
+				'It means either it, or the code editor & UI setup broke. '+
 				'I recommend you refresh the page.)'
 			);
 		} : $ => {
