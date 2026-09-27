@@ -351,7 +351,6 @@ html[data-theme="Teal"] {
 	width: fit-content;
 	margin-inline: auto;
 	text-align: center;
-	
 }
 	
 	#chasyxx-warning {
@@ -360,8 +359,7 @@ html[data-theme="Teal"] {
 	width: fit-content;
 	margin-inline: auto;
 	text-align: center;
-
-	}
+}
 
 #splash {
 	color: var(--splash-color);
