@@ -1,34 +1,4 @@
 import { formatBytes } from './utils.mjs';
-import { postfixToFunction } from './postfix.mjs';
-
-const postfixExpression = code => {
-	const body = postfixToFunction(code);
-	return `(() => {
-		let pointer = 0;
-		const values = new Array(256).fill(0);
-		const postfixStack = {
-			pop() {
-				pointer = pointer === 0 ? 255 : pointer - 1;
-				return values[pointer];
-			},
-			push(value) {
-				values[pointer++] = value;
-				pointer %= 256;
-			},
-			pick(index) {
-				const offset = Math.floor(Number(index));
-				const position = pointer - offset - 1;
-				return values[((position % 256) + 256) % 256];
-			},
-			put(index, value) {
-				const offset = Math.floor(Number(index));
-				const position = pointer - offset;
-				values[((position % 256) + 256) % 256] = value;
-			}
-		};
-		${body}
-	})()`;
-};
 
 export class UI {
 	constructor() {
@@ -100,48 +70,6 @@ export class UI {
 		this.controlDrawMode = document.getElementById('control-drawmode');
 		this.controlLag = document.getElementById('control-lag');
 		this.controlPlaybackMode = document.getElementById('control-mode');
-
-		// Notation is independent from sound mode. Add the selector here if the
-		// page markup does not already provide it.
-		let notationModeSelect = document.getElementById('control-notation-mode');
-		if(!notationModeSelect) {
-			this.controlPlaybackMode.insertAdjacentHTML('afterend',
-				'<select id="control-notation-mode" class="control-select controls-grow" ' +
-				'title="Formula notation" aria-label="Formula notation">' +
-				'<option value="Infix">Infix</option><option value="Postfix">Postfix</option></select>');
-			notationModeSelect = document.getElementById('control-notation-mode');
-		}
-		const savedNotation = localStorage.getItem('notationMode');
-		notationModeSelect.value = savedNotation === 'Postfix' ? 'Postfix' : 'Infix';
-
-		// Convert postfix source directly into stack operations; never translate it
-		// into an infix expression. The generated stack.pick(index) receives the
-		// index evaluated at runtime, enabling dynamic pick operands.
-		const bytebeat = globalThis.bytebeat;
-		const originalSendData = bytebeat.sendData.bind(bytebeat);
-		let sourceCode = null;
-		let notationMode = notationModeSelect.value;
-		bytebeat.sendData = data => {
-			if(typeof data.setFunction === 'string') {
-				sourceCode = data.setFunction;
-				if(notationMode === 'Postfix') {
-					try {
-						data = { ...data, setFunction: postfixExpression(sourceCode) };
-						document.getElementById('error').textContent = '';
-					} catch(error) {
-						document.getElementById('error').textContent = error.message;
-						return;
-					}
-				}
-			}
-			originalSendData(data);
-		};
-		notationModeSelect.addEventListener('change', () => {
-			notationMode = notationModeSelect.value;
-			localStorage.setItem('notationMode', notationMode);
-			if(sourceCode !== null) bytebeat.sendData({ setFunction: sourceCode });
-		});
-
 		this.controlPlayBackward = document.getElementById('control-play-backward');
 		this.controlPlayForward = document.getElementById('control-play-forward');
 		this.controlRecord = document.getElementById('control-rec');
