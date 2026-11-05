@@ -1,4 +1,5 @@
 import { formatBytes } from './utils.mjs';
+import { postfixToInfix } from './postfix.mjs';
 
 export class UI {
 	constructor() {
@@ -15,6 +16,7 @@ export class UI {
 		this.controlDrawMode = null;
 		this.controlLag = null;
 		this.controlPlaybackMode = null;
+		this.controlNotationMode = null;
 		this.controlPlayBackward = null;
 		this.controlPlayForward = null;
 		this.controlRecord = null;
@@ -70,6 +72,52 @@ export class UI {
 		this.controlDrawMode = document.getElementById('control-drawmode');
 		this.controlLag = document.getElementById('control-lag');
 		this.controlPlaybackMode = document.getElementById('control-mode');
+
+		// Formula notation is independent of the sound/output mode above.
+		this.controlNotationMode = document.createElement('select');
+		this.controlNotationMode.id = 'control-notation-mode';
+		this.controlNotationMode.className = this.controlPlaybackMode.className;
+		this.controlNotationMode.title = 'Formula notation (independent of sound mode)';
+		this.controlNotationMode.setAttribute('aria-label', 'Formula notation');
+		for(const mode of ['Infix', 'Postfix']) {
+			const option = document.createElement('option');
+			option.value = mode;
+			option.textContent = mode;
+			this.controlNotationMode.appendChild(option);
+		}
+		const savedNotationMode = localStorage.getItem('notationMode');
+		this.controlNotationMode.value = savedNotationMode === 'Postfix' ? 'Postfix' : 'Infix';
+		this.controlPlaybackMode.insertAdjacentElement('afterend', this.controlNotationMode);
+
+		// Adapt code sent to the audio worklet while retaining the editor's original text.
+		// This keeps postfix notation out of the sound-mode selector and lets changing
+		// notation recompile the current formula without editing the CodeMirror document.
+		const bytebeat = globalThis.bytebeat;
+		const sendData = bytebeat.sendData.bind(bytebeat);
+		let currentCode = null;
+		let notationMode = this.controlNotationMode.value;
+		bytebeat.sendData = data => {
+			if(typeof data.setFunction === 'string') {
+				currentCode = data.setFunction;
+				if(notationMode === 'Postfix') {
+					try {
+						data = { ...data, setFunction: postfixToInfix(currentCode) };
+					} catch(error) {
+						document.getElementById('error').textContent = error.message;
+						return;
+					}
+				}
+			}
+			sendData(data);
+		};
+		this.controlNotationMode.addEventListener('change', () => {
+			notationMode = this.controlNotationMode.value;
+			localStorage.setItem('notationMode', notationMode);
+			if(currentCode !== null) {
+				bytebeat.sendData({ setFunction: currentCode });
+			}
+		});
+
 		this.controlPlayBackward = document.getElementById('control-play-backward');
 		this.controlPlayForward = document.getElementById('control-play-forward');
 		this.controlRecord = document.getElementById('control-rec');
