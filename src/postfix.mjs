@@ -45,6 +45,10 @@ const customArity = new Map([
 	['min', 2], ['max', 2], ['pow', 2], ['atan2', 2], ['imul', 2], ['hypot', 2]
 ]);
 
+const stackOperators = new Set([
+	'drop', 'dup', 'swap', 'pick', 'put', 'over', 'rot', 'nip', 'tuck', '2dup', '2drop', '2swap'
+]);
+
 const numberToken = /^(?:0x[\da-f]+|[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)$/i;
 const identifierToken = /^[A-Za-z_$][\w$]*$/;
 const reservedWords = new Set(('break case catch class const continue debugger default delete do else ' +
@@ -158,8 +162,8 @@ export function postfixToFunction(code) {
 			continue;
 		}
 		if(isOperand(token) &&
-			!binaryOperators.has(token) && !functionName &&
-			!['drop', 'dup', 'swap', 'pick', 'put', 'random', '~'].includes(normalizedToken)) {
+			!binaryOperators.has(token) && !functionName && !stackOperators.has(normalizedToken) &&
+			normalizedToken !== 'random' && normalizedToken !== '~') {
 			push(token);
 			continue;
 		}
@@ -201,8 +205,16 @@ export function postfixToFunction(code) {
 			push('postfixStack.pick(0)');
 			continue;
 		}
+		if(normalizedToken === 'over') {
+			push('postfixStack.pick(1)');
+			continue;
+		}
 		if(normalizedToken === 'drop') {
 			steps.push('postfixStack.pop();');
+			continue;
+		}
+		if(normalizedToken === '2drop') {
+			steps.push('postfixStack.pop();', 'postfixStack.pop();');
 			continue;
 		}
 		if(normalizedToken === 'pick') {
@@ -221,6 +233,45 @@ export function postfixToFunction(code) {
 			steps.push('var postfixLeft = postfixStack.pop();');
 			push('postfixRight');
 			push('postfixLeft');
+			continue;
+		}
+		if(normalizedToken === 'nip') {
+			steps.push('var postfixRight = postfixStack.pop();');
+			steps.push('postfixStack.pop();');
+			push('postfixRight');
+			continue;
+		}
+		if(normalizedToken === 'tuck') {
+			steps.push('var postfixRight = postfixStack.pop();');
+			steps.push('var postfixLeft = postfixStack.pop();');
+			push('postfixRight');
+			push('postfixLeft');
+			push('postfixRight');
+			continue;
+		}
+		if(normalizedToken === 'rot') {
+			steps.push('var postfixTop = postfixStack.pop();');
+			steps.push('var postfixMiddle = postfixStack.pop();');
+			steps.push('var postfixBottom = postfixStack.pop();');
+			push('postfixMiddle');
+			push('postfixTop');
+			push('postfixBottom');
+			continue;
+		}
+		if(normalizedToken === '2dup') {
+			push('postfixStack.pick(1)');
+			push('postfixStack.pick(1)');
+			continue;
+		}
+		if(normalizedToken === '2swap') {
+			steps.push('var postfixTop = postfixStack.pop();');
+			steps.push('var postfixNext = postfixStack.pop();');
+			steps.push('var postfixThird = postfixStack.pop();');
+			steps.push('var postfixBottom = postfixStack.pop();');
+			push('postfixThird');
+			push('postfixTop');
+			push('postfixBottom');
+			push('postfixNext');
 			continue;
 		}
 		validateExpression(token, 'postfix');
@@ -251,8 +302,8 @@ export function postfixToInfix(code) {
 			continue;
 		}
 		if(isOperand(token) &&
-			!binaryOperators.has(token) && !functionName &&
-			!['drop', 'dup', 'swap', 'pick', 'put', 'random', '~'].includes(normalizedToken)) {
+			!binaryOperators.has(token) && !functionName && !stackOperators.has(normalizedToken) &&
+			normalizedToken !== 'random' && normalizedToken !== '~') {
 			stack.push(token);
 			continue;
 		}
@@ -280,10 +331,20 @@ export function postfixToInfix(code) {
 			continue;
 		}
 		if(normalizedToken === 'dup') {
-			stack.push(stack[stack.length - 1]);
+			stack.push(pop(stack, token), stack[stack.length - 1]);
+			continue;
+		}
+		if(normalizedToken === 'over') {
+			if(stack.length < 2) pop(stack, token);
+			stack.push(stack[stack.length - 2]);
 			continue;
 		}
 		if(normalizedToken === 'drop') {
+			pop(stack, token);
+			continue;
+		}
+		if(normalizedToken === '2drop') {
+			pop(stack, token);
 			pop(stack, token);
 			continue;
 		}
@@ -293,8 +354,6 @@ export function postfixToInfix(code) {
 				const offset = Math.floor(Number(index));
 				stack.push(offset >= 0 && offset < stack.length ? stack[stack.length - 1 - offset] : '0');
 			} else {
-				// Keep the dynamic index at runtime and select from the current stack.
-				// Values are listed top-first, matching postfixStack.pick(index).
 				const values = stack.slice().reverse();
 				stack.push(`([${ values.join(',') }][Math.floor(${ index })] ?? 0)`);
 			}
@@ -315,6 +374,38 @@ export function postfixToInfix(code) {
 			const right = pop(stack, token);
 			const left = pop(stack, token);
 			stack.push(right, left);
+			continue;
+		}
+		if(normalizedToken === 'nip') {
+			const right = pop(stack, token);
+			pop(stack, token);
+			stack.push(right);
+			continue;
+		}
+		if(normalizedToken === 'tuck') {
+			const right = pop(stack, token);
+			const left = pop(stack, token);
+			stack.push(right, left, right);
+			continue;
+		}
+		if(normalizedToken === 'rot') {
+			const top = pop(stack, token);
+			const middle = pop(stack, token);
+			const bottom = pop(stack, token);
+			stack.push(middle, top, bottom);
+			continue;
+		}
+		if(normalizedToken === '2dup') {
+			if(stack.length < 2) pop(stack, token);
+			stack.push(stack[stack.length - 2], stack[stack.length - 1]);
+			continue;
+		}
+		if(normalizedToken === '2swap') {
+			const top = pop(stack, token);
+			const next = pop(stack, token);
+			const third = pop(stack, token);
+			const bottom = pop(stack, token);
+			stack.push(third, top, bottom, next);
 			continue;
 		}
 		validateExpression(token, 'postfix');
@@ -347,7 +438,7 @@ export function prefixToPostfix(code) {
 			for(let i = 0; i < arity; i++) args.push(stack.pop());
 			stack.push(`${args.join(' ')} ${token}`);
 		} else {
-			if(['dup', 'drop', 'swap', 'pick', 'put'].includes(lower)) {
+			if(stackOperators.has(lower)) {
 				throw unexpectedToken('prefix', token);
 			}
 			if(!isOperand(token)) validateExpression(token, 'prefix');
