@@ -73,25 +73,18 @@ export class UI {
 		this.controlLag = document.getElementById('control-lag');
 		this.controlPlaybackMode = document.getElementById('control-mode');
 
-		// Formula notation is independent of the sound/output mode above.
-		this.controlNotationMode = document.createElement('select');
-		this.controlNotationMode.id = 'control-notation-mode';
-		this.controlNotationMode.className = this.controlPlaybackMode.className;
-		this.controlNotationMode.title = 'Formula notation (independent of sound mode)';
-		this.controlNotationMode.setAttribute('aria-label', 'Formula notation');
-		for(const mode of ['Infix', 'Postfix']) {
-			const option = document.createElement('option');
-			option.value = mode;
-			option.textContent = mode;
-			this.controlNotationMode.appendChild(option);
-		}
+		// Formula notation is independent of the sound/output mode.
+		this.controlPlaybackMode.insertAdjacentHTML('afterend', `
+			<select id="control-notation-mode" class="control-select controls-grow"
+				title="Formula notation (independent of sound mode)" aria-label="Formula notation">
+				<option value="Infix">Infix</option>
+				<option value="Postfix">Postfix</option>
+			</select>`);
+		this.controlNotationMode = document.getElementById('control-notation-mode');
 		const savedNotationMode = localStorage.getItem('notationMode');
 		this.controlNotationMode.value = savedNotationMode === 'Postfix' ? 'Postfix' : 'Infix';
-		this.controlPlaybackMode.insertAdjacentElement('afterend', this.controlNotationMode);
 
 		// Adapt code sent to the audio worklet while retaining the editor's original text.
-		// This keeps postfix notation out of the sound-mode selector and lets changing
-		// notation recompile the current formula without editing the CodeMirror document.
 		const bytebeat = globalThis.bytebeat;
 		const sendData = bytebeat.sendData.bind(bytebeat);
 		let currentCode = null;
