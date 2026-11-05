@@ -1,9 +1,7 @@
 import { formatBytes } from './utils.mjs';
 import { postfixToFunction } from './postfix.mjs';
 
-// Compile postfix tokens into a JavaScript expression that evaluates the
-// postfix stack directly on each sample (without translating to infix).
-const postfixToExpression = code => {
+const postfixExpression = code => {
 	const body = postfixToFunction(code);
 	return `(() => {
 		let pointer = 0;
@@ -47,7 +45,6 @@ export class UI {
 		this.controlDrawMode = null;
 		this.controlLag = null;
 		this.controlPlaybackMode = null;
-		this.controlNotationMode = null;
 		this.controlPlayBackward = null;
 		this.controlPlayForward = null;
 		this.controlRecord = null;
@@ -104,32 +101,32 @@ export class UI {
 		this.controlLag = document.getElementById('control-lag');
 		this.controlPlaybackMode = document.getElementById('control-mode');
 
-		// Formula notation is independent of the sound/output mode.
-		this.controlNotationMode = document.getElementById('control-notation-mode');
-		if(!this.controlNotationMode) {
-			this.controlPlaybackMode.insertAdjacentHTML('afterend', `
-				<select id="control-notation-mode" class="control-select controls-grow"
-					title="Formula notation" aria-label="Formula notation">
-					<option value="Infix">Infix</option>
-					<option value="Postfix">Postfix</option>
-				</select>`);
-			this.controlNotationMode = document.getElementById('control-notation-mode');
+		// Notation is independent from sound mode. Add the selector here if the
+		// page markup does not already provide it.
+		let notationModeSelect = document.getElementById('control-notation-mode');
+		if(!notationModeSelect) {
+			this.controlPlaybackMode.insertAdjacentHTML('afterend',
+				'<select id="control-notation-mode" class="control-select controls-grow" ' +
+				'title="Formula notation" aria-label="Formula notation">' +
+				'<option value="Infix">Infix</option><option value="Postfix">Postfix</option></select>');
+			notationModeSelect = document.getElementById('control-notation-mode');
 		}
-		const savedNotationMode = localStorage.getItem('notationMode');
-		this.controlNotationMode.value = savedNotationMode === 'Postfix' ? 'Postfix' : 'Infix';
+		const savedNotation = localStorage.getItem('notationMode');
+		notationModeSelect.value = savedNotation === 'Postfix' ? 'Postfix' : 'Infix';
 
-		// Keep the editor text in its selected notation and adapt only the code
-		// sent to the audio evaluator.
+		// Convert postfix source directly into stack operations; never translate it
+		// into an infix expression. The generated stack.pick(index) receives the
+		// index evaluated at runtime, enabling dynamic pick operands.
 		const bytebeat = globalThis.bytebeat;
 		const originalSendData = bytebeat.sendData.bind(bytebeat);
 		let sourceCode = null;
-		let notationMode = this.controlNotationMode.value;
+		let notationMode = notationModeSelect.value;
 		bytebeat.sendData = data => {
 			if(typeof data.setFunction === 'string') {
 				sourceCode = data.setFunction;
 				if(notationMode === 'Postfix') {
 					try {
-						data = { ...data, setFunction: postfixToExpression(sourceCode) };
+						data = { ...data, setFunction: postfixExpression(sourceCode) };
 						document.getElementById('error').textContent = '';
 					} catch(error) {
 						document.getElementById('error').textContent = error.message;
@@ -139,12 +136,10 @@ export class UI {
 			}
 			originalSendData(data);
 		};
-		this.controlNotationMode.addEventListener('change', () => {
-			notationMode = this.controlNotationMode.value;
+		notationModeSelect.addEventListener('change', () => {
+			notationMode = notationModeSelect.value;
 			localStorage.setItem('notationMode', notationMode);
-			if(sourceCode !== null) {
-				bytebeat.sendData({ setFunction: sourceCode });
-			}
+			if(sourceCode !== null) bytebeat.sendData({ setFunction: sourceCode });
 		});
 
 		this.controlPlayBackward = document.getElementById('control-play-backward');
