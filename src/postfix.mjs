@@ -289,11 +289,15 @@ export function postfixToInfix(code) {
 		}
 		if(normalizedToken === 'pick') {
 			const index = pop(stack, token);
-			if(!numberToken.test(index)) {
-				throw new SyntaxError(`postfix: dynamic pick is not supported for ${ index }`);
+			if(numberToken.test(index)) {
+				const offset = Math.floor(Number(index));
+				stack.push(offset >= 0 && offset < stack.length ? stack[stack.length - 1 - offset] : '0');
+			} else {
+				// Keep the dynamic index at runtime and select from the current stack.
+				// Values are listed top-first, matching postfixStack.pick(index).
+				const values = stack.slice().reverse();
+				stack.push(`([${ values.join(',') }][Math.floor(${ index })] ?? 0)`);
 			}
-			const offset = Math.floor(Number(index));
-			stack.push(offset >= 0 && offset < stack.length ? stack[stack.length - 1 - offset] : '0');
 			continue;
 		}
 		if(normalizedToken === 'put') {
